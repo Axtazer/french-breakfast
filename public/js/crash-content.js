@@ -47,6 +47,7 @@ export function linuxCrash(ctx) {
     `[ 4242.000080] Kernel panic - not syncing: ${ctx.message}`,
     `[ 4242.000081] Hint: ${ctx.hint}`,
     `[ 4242.000090] ---[ end Kernel panic - not syncing: ${ctx.stopCode} ]---`,
+    '[ 4242.000102] drm_panic: scan the QR code to find the nearest bakery',
   );
   return lines;
 }

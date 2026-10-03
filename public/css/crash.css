@@ -12,6 +12,10 @@
   z-index: 1000;
   overflow: hidden;
   background: #000;
+  /* Comme un vrai écran de crash : aucun texte sélectionnable. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .crash > div {
@@ -22,6 +26,12 @@
 .is-idle,
 .is-idle * {
   cursor: none !important;
+}
+
+.crash-page,
+.crash-controls {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .crash-controls {
@@ -195,6 +205,28 @@
   line-height: 1.35;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .kpanic-log {
+    font-size: 0.62rem;
+  }
+}
+
+/* QR code en demi-blocs : interligne 1 puis étirement vertical pour des modules carrés. */
+.kpanic-qr {
+  display: inline-block;
+  margin: 0.4em 0 0;
+  color: #e6e6e6;
+  font-family: 'DejaVu Sans Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: clamp(7px, 1.25vh, 13px);
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: pre;
+  transform: scaleY(1.2);
+  transform-origin: top left;
+  /* scaleY n'agrandit pas la boîte : on réserve les 20 % ajoutés (19 lignes × 0,2). */
+  margin-bottom: 3.8em;
 }
 
 .kpanic-cursor {

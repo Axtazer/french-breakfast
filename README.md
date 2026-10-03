@@ -62,7 +62,7 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 │   ├── crash.html              # faux écran de crash selon l'OS
 │   ├── css/style.css, css/crash.css
 │   ├── img/croissant.svg       # logo
-│   ├── img/qr-boulangerie.svg  # QR code de l'écran de crash (généré)
+│   ├── img/qr-boulangerie.svg  # QR code de l'écran de crash Windows (généré)
 │   └── js/
 │       ├── app.js              # logique de la page d'accueil
 │       ├── fullscreen.js       # logique de la vue alternative
@@ -70,10 +70,11 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 │       ├── crash-view.js       # rendu des écrans de crash (accueil et /crash)
 │       ├── crash-content.js    # textes des écrans de crash — testés
 │       ├── os.js               # détection de l'OS (locale) — testée
+│       ├── qr-boulangerie-text.js # QR code en texte de l'écran Linux (généré)
 │       ├── message.js          # logique pure (templates, nettoyage) — testée
 │       ├── config.js           # chargement de /config.json
 │       └── defaults.js         # configuration par défaut (partagée avec le serveur)
-├── scripts/generate-qr.mjs     # régénère le QR code (npm run qr)
+├── scripts/generate-qr.mjs     # régénère les QR codes (npm run qr)
 ├── src/
 │   ├── server.js               # serveur HTTP
 │   ├── config.js               # chargement de la config (défauts < CONFIG_FILE < env)
@@ -124,8 +125,13 @@ La détection est approximative par nature (un iPad se présente comme un Mac, l
 L'écran de crash affiche le message du croissantage, l'**heure du croissantage**, le croissanteur, le code d'arrêt et
 le raccourci de verrouillage. Sur l'écran Windows, le **QR code** est un vrai QR code qui ouvre
 [les boulangeries à proximité sur Google Maps](https://www.google.com/maps/search/?api=1&query=boulangerie).
-C'est une image statique (`public/img/qr-boulangerie.svg`) générée par `npm run qr` (`scripts/generate-qr.mjs`) :
+Sur l'écran Linux, le même QR code s'affiche **en texte** (demi-blocs Unicode, façon `qrencode -t UTF8`), comme
+le QR code de l'écran de panic du noyau. Les deux versions sont générées une fois pour toutes par `npm run qr`
+(`scripts/generate-qr.mjs` → `public/img/qr-boulangerie.svg` et `public/js/qr-boulangerie-text.js`) :
 aucune requête externe tant que personne ne le scanne.
+
+Comme un vrai écran de crash, rien n'y est sélectionnable ni copiable (sélection, Ctrl + C et clic droit bloqués),
+et **un clic n'importe où repasse en plein écran** (par exemple après Échap).
 Depuis l'accueil, **🥐 CROISSANTER** l'affiche dans la même page et appelle `requestFullscreen()` dans le même clic :
 c'est ce geste utilisateur qui autorise le plein écran (aucun contournement des restrictions navigateur).
 En accès direct à `/crash`, le navigateur exige un clic : un clic n'importe où passe alors en plein écran.
@@ -152,7 +158,7 @@ npm start        # lancement simple
 npm run lint     # ESLint
 npm test         # tests (node --test)
 npm run check    # lint + tests (avant chaque push)
-npm run qr       # régénère le QR code de l'écran de crash
+npm run qr       # régénère les QR codes des écrans de crash
 ```
 
 ## Docker
