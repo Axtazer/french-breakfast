@@ -45,7 +45,7 @@
       <section class="result" aria-label="Message">
         <button type="button" id="message" class="message-box" aria-describedby="copy-feedback">
           <span id="message-text"></span>
-          <span class="message-hint" aria-hidden="true">Cliquer pour copier</span>
+          <span class="message-hint" aria-hidden="true">Cliquer ou <kbd id="copy-shortcut">Ctrl + C</kbd> pour copier</span>
         </button>
         <div class="actions">
           <button type="button" id="copy-btn" class="btn btn-secondary">📋 Copier<span class="wide-only">le message</span></button>
@@ -54,7 +54,9 @@
         <p id="copy-feedback" class="feedback" role="status" aria-live="polite"></p>
       </section>
 
-      <button type="button" id="croissanter-btn" class="btn btn-primary">🥐 CROISSANTER</button>
+      <button type="button" id="croissanter-btn" class="btn btn-primary" aria-keyshortcuts="Enter">
+        🥐 CROISSANTER <kbd class="kbd-hint" aria-hidden="true">Entrée ↵</kbd>
+      </button>
     </main>
 
     <footer class="footer">

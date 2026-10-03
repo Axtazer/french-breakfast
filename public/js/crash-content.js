@@ -80,6 +80,42 @@ export function linuxCrash(ctx) {
   return lines;
 }
 
+/** Linux de bureau (GNOME) : l'écran « Oh non ! Un problème est survenu… ». */
+export function gnomeCrash(ctx) {
+  const details = [`Heure du croissantage : ${ctx.time}`];
+  if (ctx.by) details.push(`Croissanté par : ${ctx.by}`);
+  details.push(`Code d’arrêt : ${ctx.stopCode}`);
+  return {
+    title: 'Oh non ! Un problème est survenu et le système ne peut pas se rétablir.',
+    body: 'Veuillez ramener des croissants, puis vous déconnecter et réessayer.',
+    message: ctx.message,
+    details,
+    hint: ctx.hint,
+    qrCaption: 'Besoin d’aide ? Scannez ce code pour trouver une boulangerie à proximité.',
+    button: 'Fermer la session',
+    refused: 'Impossible de fermer la session : des croissants sont attendus.',
+  };
+}
+
+/** ChromeOS : l'écran de récupération « ChromeOS est manquant ou endommagé » (avec son QR code). */
+export function chromeosCrash(ctx) {
+  const details = [`Heure du croissantage : ${ctx.time}`];
+  if (ctx.by) details.push(`Croissanté par : ${ctx.by}`);
+  details.push(`Code d’erreur : ${ctx.stopCode}`);
+  return {
+    brand: 'croissantOS',
+    title: 'croissantOS est manquant ou endommagé.',
+    body: 'Veuillez ramener des croissants à toute l’équipe, puis lancer la récupération.',
+    message: ctx.message,
+    details,
+    hint: ctx.hint,
+    qrCaption: 'Pour en savoir plus, scannez ce code avec votre téléphone.',
+    primary: 'Lancer la récupération',
+    secondary: 'Options avancées',
+    refused: 'Récupération impossible : aucun croissant détecté.',
+  };
+}
+
 /** Heure du croissantage au format français : "15h42". */
 export function formatCrashTime(date = new Date()) {
   const hh = String(date.getHours()).padStart(2, '0');

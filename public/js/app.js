@@ -2,7 +2,7 @@ import { loadConfig } from './config.js';
 import { formatCrashTime } from './crash-content.js';
 import { blockCopy, fullscreenOnClick, hideIdleCursor, mountCrash } from './crash-view.js';
 import { buildMessage, parseNames, pickTemplateIndex, readParams, sanitizeName } from './message.js';
-import { crashTheme, lockHint, resolveOS } from './os.js';
+import { crashTheme, detectOS, lockHint, resolveOS } from './os.js';
 
 const RECENT_KEY = 'croissante.recentNames';
 const MAX_RECENT = 8;
@@ -179,6 +179,27 @@ async function init() {
     document.body.classList.add('is-crashing');
   });
   $('crash-close').addEventListener('click', closeCrash);
+
+  // Raccourcis clavier : Ctrl/Cmd + C copie le message, Entrée lance le croissantage.
+  const isMac = detectOS(navigator).startsWith('mac');
+  $('copy-shortcut').textContent = isMac ? '⌘ + C' : 'Ctrl + C';
+  document.addEventListener('copy', (event) => {
+    if (!overlay.hidden) return;
+    const active = document.activeElement;
+    const fieldSelection = active instanceof HTMLInputElement && active.selectionStart !== active.selectionEnd;
+    if (fieldSelection || window.getSelection()?.toString()) return; // copie normale d'une sélection
+    event.preventDefault();
+    event.clipboardData.setData('text/plain', currentMessage());
+    setFeedback('Message copié ✓', 'is-ok');
+    rememberNames(config, currentNames());
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || event.isComposing || !overlay.hidden || $('croissanter-btn').hidden) return;
+    if (event.target instanceof Element && event.target.closest('button, a, textarea')) return; // natif
+    event.preventDefault();
+    // Clic simulé pendant le geste clavier : le plein écran reste autorisé par le navigateur.
+    $('croissanter-btn').click();
+  });
 
   renderChips();
   render();

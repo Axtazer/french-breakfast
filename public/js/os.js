@@ -1,6 +1,15 @@
 // Détection de l'OS, 100 % locale (rien n'est envoyé au serveur). Logique pure, testée sous Node.
 
-export const KNOWN_OS = Object.freeze(['windows', 'mac', 'mac-classic', 'linux', 'chromeos', 'ios', 'android']);
+export const KNOWN_OS = Object.freeze([
+  'windows',
+  'mac',
+  'mac-classic',
+  'linux',
+  'linux-console',
+  'chromeos',
+  'ios',
+  'android',
+]);
 
 /**
  * Devine l'OS à partir de l'objet navigator.
@@ -37,7 +46,15 @@ function isClassicMac(source) {
 /** Valide une valeur ?os= fournie dans l'URL (liste blanche). */
 export function parseOSParam(value) {
   const v = String(value ?? '').trim().toLowerCase();
-  const aliases = { win: 'windows', macos: 'mac', osx: 'mac', macclassic: 'mac-classic', cros: 'chromeos' };
+  const aliases = {
+    win: 'windows',
+    macos: 'mac',
+    osx: 'mac',
+    macclassic: 'mac-classic',
+    gnome: 'linux',
+    console: 'linux-console',
+    cros: 'chromeos',
+  };
   const os = aliases[v] ?? v;
   return KNOWN_OS.includes(os) ? os : null;
 }
@@ -49,7 +66,7 @@ export function resolveOS(search, nav) {
 
 /** Texte secondaire avec le raccourci de verrouillage adapté à l'OS. */
 export function lockHint(config, os) {
-  const shortcut = config.lockShortcuts?.[os];
+  const shortcut = config.lockShortcuts?.[os === 'linux-console' ? 'linux' : os];
   if (!shortcut) return config.fullscreenSubtitleFallback;
   return config.fullscreenSubtitle.replace(/\{shortcut\}/g, () => shortcut);
 }
@@ -58,6 +75,9 @@ export function lockHint(config, os) {
 export function crashTheme(os) {
   if (os === 'mac' || os === 'ios') return 'mac';
   if (os === 'mac-classic') return 'mac-classic';
-  if (os === 'linux' || os === 'chromeos' || os === 'android') return 'linux';
+  if (os === 'chromeos') return 'chromeos';
+  // Linux de bureau : écran GNOME ; console (kernel panic + QR texte) sur demande ou pour Android.
+  if (os === 'linux') return 'gnome';
+  if (os === 'linux-console' || os === 'android') return 'linux';
   return 'windows';
 }

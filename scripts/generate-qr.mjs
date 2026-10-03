@@ -1,5 +1,6 @@
 // Génère les QR codes statiques des écrans de crash :
-//  - public/img/qr-boulangerie.svg  : image (écran Windows) ;
+//  - public/img/qr-boulangerie.svg  : image orange (écran Windows) ;
+//  - public/img/qr-boulangerie-dark.svg : image noire (macOS, GNOME, ChromeOS) ;
 //  - public/js/qr-boulangerie-text.js : version texte en demi-blocs Unicode, façon `qrencode -t UTF8`
 //    (écran Linux, comme le QR code de l'écran de panic du noyau).
 // Usage : npm run qr   (à relancer uniquement si l'URL ou les couleurs changent)
@@ -9,17 +10,22 @@ import { CRASH_QR_URL } from '../public/js/crash-content.js';
 
 const TARGET_URL = CRASH_QR_URL;
 const SVG_OUTPUT = new URL('../public/img/qr-boulangerie.svg', import.meta.url);
+const SVG_DARK_OUTPUT = new URL('../public/img/qr-boulangerie-dark.svg', import.meta.url);
 const TEXT_OUTPUT = new URL('../public/js/qr-boulangerie-text.js', import.meta.url);
 const QUIET_ZONE = 2;
 
-const svg = await QRCode.toString(TARGET_URL, {
-  type: 'svg',
-  errorCorrectionLevel: 'M',
-  margin: QUIET_ZONE,
-  // Modules orange sur fond blanc, assortis à l'écran de crash.
-  color: { dark: '#dc4c00', light: '#ffffff' },
-});
-writeFileSync(SVG_OUTPUT, `${svg.trim()}\n`);
+const writeSvg = async (output, dark) => {
+  const svg = await QRCode.toString(TARGET_URL, {
+    type: 'svg',
+    errorCorrectionLevel: 'M',
+    margin: QUIET_ZONE,
+    color: { dark, light: '#ffffff' },
+  });
+  writeFileSync(output, `${svg.trim()}\n`);
+};
+// Orange sur blanc pour l'écran Windows, noir sur blanc pour les autres (macOS, GNOME, ChromeOS).
+await writeSvg(SVG_OUTPUT, '#dc4c00');
+await writeSvg(SVG_DARK_OUTPUT, '#1d1d1f');
 
 // Version texte, prévue pour du texte clair sur fond noir (console) : les modules "clairs" sont dessinés
 // avec des blocs, les modules "sombres" restent vides. Deux lignes de modules par ligne de texte.

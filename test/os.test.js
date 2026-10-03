@@ -38,6 +38,9 @@ test('parseOSParam applique une liste blanche', () => {
   assert.equal(parseOSParam(' MacOS '), 'mac');
   assert.equal(parseOSParam('win'), 'windows');
   assert.equal(parseOSParam('mac-classic'), 'mac-classic');
+  assert.equal(parseOSParam('linux-console'), 'linux-console');
+  assert.equal(parseOSParam('console'), 'linux-console');
+  assert.equal(parseOSParam('gnome'), 'linux');
   assert.equal(parseOSParam('<script>'), null);
   assert.equal(parseOSParam(null), null);
 });
@@ -51,6 +54,7 @@ test('lockHint affiche le bon raccourci, ou le texte de repli', () => {
   assert.equal(lockHint(DEFAULT_CONFIG, 'windows'), 'Pense à Win + L la prochaine fois.');
   assert.equal(lockHint(DEFAULT_CONFIG, 'mac'), 'Pense à Ctrl + Cmd + Q la prochaine fois.');
   assert.equal(lockHint(DEFAULT_CONFIG, 'linux'), 'Pense à Super + L la prochaine fois.');
+  assert.equal(lockHint(DEFAULT_CONFIG, 'linux-console'), 'Pense à Super + L la prochaine fois.');
   assert.equal(lockHint(DEFAULT_CONFIG, 'ios'), 'Pense à verrouiller ton poste la prochaine fois.');
   // Ctrl + Cmd + Q n'existe pas avant macOS 10.13 : texte générique.
   assert.equal(lockHint(DEFAULT_CONFIG, 'mac-classic'), 'Pense à verrouiller ton poste la prochaine fois.');
@@ -63,7 +67,8 @@ test('crashTheme associe chaque OS à un écran', () => {
   assert.equal(crashTheme('mac'), 'mac');
   assert.equal(crashTheme('ios'), 'mac');
   assert.equal(crashTheme('mac-classic'), 'mac-classic');
-  assert.equal(crashTheme('linux'), 'linux');
-  assert.equal(crashTheme('chromeos'), 'linux');
+  assert.equal(crashTheme('linux'), 'gnome');
+  assert.equal(crashTheme('linux-console'), 'linux');
+  assert.equal(crashTheme('chromeos'), 'chromeos');
   assert.equal(crashTheme('android'), 'linux');
 });

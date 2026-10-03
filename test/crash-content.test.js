@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import QRCode from 'qrcode';
 import {
   CRASH_QR_URL,
+  chromeosCrash,
+  gnomeCrash,
   formatCrashTime,
   formatMenuBarDate,
   linuxCrash,
@@ -50,6 +52,24 @@ test('ancien écran macOS : texte multilingue', () => {
   for (const key of ['fr', 'en', 'de', 'ja']) assert.ok(text[key].length > 0, key);
   assert.equal(text.time, 'Croissanté à 08h47');
   assert.equal(text.message, ctx.message);
+});
+
+test('écran GNOME : « Oh non ! », message, détails et aide QR', () => {
+  const text = gnomeCrash(ctx);
+  assert.match(text.title, /^Oh non ! Un problème est survenu/);
+  assert.equal(text.message, ctx.message);
+  assert.deepEqual(text.details, ['Heure du croissantage : 08h47', 'Croissanté par : Alex', 'Code d’arrêt : CROISSANTS_NOT_DELIVERED']);
+  assert.match(text.qrCaption, /boulangerie/);
+  assert.equal(gnomeCrash({ ...ctx, by: '' }).details.length, 2);
+});
+
+test('écran ChromeOS : récupération, QR code et boutons', () => {
+  const text = chromeosCrash(ctx);
+  assert.equal(text.title, 'croissantOS est manquant ou endommagé.');
+  assert.equal(text.message, ctx.message);
+  assert.ok(text.details.includes('Croissanté par : Alex'));
+  assert.match(text.qrCaption, /scannez ce code/);
+  assert.equal(text.primary, 'Lancer la récupération');
 });
 
 test('formatMenuBarDate : date de la barre de menus macOS', () => {
