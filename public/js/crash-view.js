@@ -1,6 +1,6 @@
 // Rendu DOM des écrans de crash, partagé par /crash et par l'accueil (bouton CROISSANTER).
 // Tout le texte passe par textContent : aucune donnée n'est interprétée comme du HTML.
-import { linuxCrash, macCrash, windowsCrash } from './crash-content.js';
+import { formatMenuBarDate, linuxCrash, macClassicCrash, macCrash, windowsCrash } from './crash-content.js';
 import { QR_TEXT } from './qr-boulangerie-text.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -83,8 +83,97 @@ function windowsScreen(ctx, timers) {
   return screen;
 }
 
-function macScreen(ctx) {
+/**
+ * macOS récent : faux redémarrage (écran noir, logo, barre de progression), puis bureau
+ * avec la fenêtre système « Votre ordinateur a redémarré en raison d'un problème ».
+ */
+function macScreen(ctx, timers) {
   const text = macCrash(ctx);
+
+  // 1. Démarrage : logo (notre croissant en silhouette blanche) + barre de progression.
+  const bar = el('div', { className: 'macos-boot-bar' }, el('span'));
+  const boot = el(
+    'div',
+    { className: 'macos-boot' },
+    el('img', { className: 'macos-boot-logo', src: 'img/croissant.svg', alt: '', draggable: false }),
+    bar,
+  );
+
+  // 2. Bureau : barre de menus + fenêtre de rapport.
+  const report = el(
+    'div',
+    { className: 'macos-report', hidden: true },
+    el('p', { className: 'macos-report-title' }, text.reportTitle),
+    el('pre', {}, text.reportLines.join('\n')),
+  );
+  const refused = el('p', { className: 'macos-refused', attrs: { role: 'alert' } });
+  const dialog = el(
+    'div',
+    { className: 'macos-dialog', attrs: { role: 'alertdialog', 'aria-labelledby': 'macos-dialog-title' } },
+    el('img', { className: 'macos-dialog-icon', src: 'img/croissant.svg', alt: '', draggable: false }),
+    el('h1', { className: 'macos-dialog-title', id: 'macos-dialog-title' }, text.title),
+    el('p', { className: 'macos-dialog-body' }, text.body),
+    report,
+    refused,
+    el(
+      'div',
+      { className: 'macos-dialog-buttons' },
+      el('button', { type: 'button', className: 'macos-btn', onclick: () => {
+        refused.textContent = text.ignoreRefused;
+        dialog.classList.remove('is-shaking');
+        void dialog.offsetWidth; // relance l'animation
+        dialog.classList.add('is-shaking');
+      } }, text.ignore),
+      el('button', { type: 'button', className: 'macos-btn macos-btn-primary', onclick: () => {
+        report.hidden = false;
+      } }, text.report),
+    ),
+  );
+  const clock = el('span', {}, formatMenuBarDate());
+  const desktop = el(
+    'div',
+    { className: 'macos-desktop', hidden: true },
+    el(
+      'div',
+      { className: 'macos-menubar', attrs: { 'aria-hidden': 'true' } },
+      el('img', { className: 'macos-menubar-logo', src: 'img/croissant.svg', alt: '', draggable: false }),
+      el('strong', {}, 'Finder'),
+      ...['Fichier', 'Édition', 'Présentation', 'Aller', 'Fenêtre', 'Aide'].map((m) => el('span', {}, m)),
+      el('span', { className: 'macos-menubar-spacer' }),
+      clock,
+    ),
+    dialog,
+  );
+
+  const showDesktop = () => {
+    boot.hidden = true;
+    desktop.hidden = false;
+  };
+  if (reduceMotion()) {
+    showDesktop();
+  } else {
+    let progress = 0;
+    const timer = setInterval(() => {
+      progress = Math.min(100, progress + 4 + Math.random() * 10);
+      bar.firstChild.style.width = `${progress}%`;
+      if (progress === 100) {
+        clearInterval(timer);
+        timers.push(setTimeout(showDesktop, 600));
+      }
+    }, 200);
+    timers.push(timer);
+  }
+  const clockTimer = setInterval(() => {
+    clock.textContent = formatMenuBarDate();
+  }, 15000);
+  timers.push(clockTimer);
+
+  return el('div', { className: 'macos' }, boot, desktop);
+}
+
+/** Ancien macOS : kernel panic multilingue (OS X 10.2 à 10.7). */
+function macClassicScreen(ctx) {
+  const text = macClassicCrash(ctx);
   return el(
     'div',
     { className: 'macpanic' },
@@ -145,11 +234,16 @@ const BLOCKED_EVENTS = ['copy', 'cut', 'contextmenu', 'selectstart', 'dragstart'
  */
 export function mountCrash(root, theme, ctx) {
   const timers = [];
-  const build = { windows: windowsScreen, mac: macScreen, linux: linuxScreen }[theme] ?? windowsScreen;
+  const build =
+    { windows: windowsScreen, mac: macScreen, 'mac-classic': macClassicScreen, linux: linuxScreen }[theme] ??
+    windowsScreen;
   root.replaceChildren(build(ctx, timers));
   root.dataset.theme = theme;
   return () => {
-    for (const timer of timers) clearInterval(timer);
+    for (const timer of timers) {
+      clearInterval(timer);
+      clearTimeout(timer);
+    }
     root.replaceChildren();
   };
 }

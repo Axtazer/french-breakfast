@@ -1,7 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import QRCode from 'qrcode';
-import { CRASH_QR_URL, formatCrashTime, linuxCrash, macCrash, windowsCrash } from '../public/js/crash-content.js';
+import {
+  CRASH_QR_URL,
+  formatCrashTime,
+  formatMenuBarDate,
+  linuxCrash,
+  macClassicCrash,
+  macCrash,
+  windowsCrash,
+} from '../public/js/crash-content.js';
 import { QR_TEXT } from '../public/js/qr-boulangerie-text.js';
 
 const ctx = {
@@ -23,12 +31,30 @@ test('écran Windows : contient croissanteur, message et code d’arrêt', () =>
   assert.equal(windowsCrash({ ...ctx, by: '' }).by, '');
 });
 
-test('écran macOS : texte multilingue', () => {
+test('écran macOS récent : fenêtre « redémarré en raison d’un problème » et rapport détaillé', () => {
   const text = macCrash(ctx);
+  assert.equal(text.title, 'Votre ordinateur a redémarré en raison d’un problème.');
+  assert.equal(text.ignore, 'Ignorer');
+  assert.equal(text.report, 'Signaler…');
+  const report = text.reportLines.join('\n');
+  assert.match(report, /^panic\(cpu 0/);
+  assert.match(report, /Heure du croissantage : 08h47/);
+  assert.match(report, /Croissanté par : Alex/);
+  assert.match(report, /CROISSANTS_NOT_DELIVERED/);
+  assert.ok(report.includes(ctx.message));
+  assert.ok(!macCrash({ ...ctx, by: '' }).reportLines.some((l) => l.startsWith('Croissanté par')));
+});
+
+test('ancien écran macOS : texte multilingue', () => {
+  const text = macClassicCrash(ctx);
   for (const key of ['fr', 'en', 'de', 'ja']) assert.ok(text[key].length > 0, key);
-  assert.match(text.fr, /croissants/);
-  assert.equal(text.message, ctx.message);
   assert.equal(text.time, 'Croissanté à 08h47');
+  assert.equal(text.message, ctx.message);
+});
+
+test('formatMenuBarDate : date de la barre de menus macOS', () => {
+  assert.equal(formatMenuBarDate(new Date(2026, 9, 3, 8, 5)), 'sam. 3 oct. 08:05');
+  assert.equal(formatMenuBarDate(new Date(2026, 0, 12, 23, 59)), 'lun. 12 janv. 23:59');
 });
 
 test('écran Linux : log de kernel panic avec le message', () => {

@@ -14,7 +14,7 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
    🎲 pour en changer, mention facultative de collègues (« Et oui, même pour Camille, Sam et Léo ! ») ;
 2. **un clic sur le message le copie** (ou bouton 📋) : le coller dans Teams, Slack… il part **avec le compte de la victime** ;
 3. **🥐 CROISSANTER** : un **faux écran de crash** adapté à l'OS du poste s'affiche aussitôt **en plein écran**
-   (écran de crash Windows version orange, kernel panic macOS ou Linux).
+   (écran de crash Windows version orange, redémarrage « problème » macOS ou kernel panic Linux).
 
 > L'application **n'envoie rien** : elle génère uniquement un message prêt à copier/coller.
 > Aucun compte, aucun secret, aucune intégration Teams/mail.
@@ -29,7 +29,7 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
 
 | Windows | macOS | Linux |
 | --- | --- | --- |
-| ![Écran de crash Windows (orange)](docs/screenshot-crash-windows.png) | ![Kernel panic macOS](docs/screenshot-crash-mac.png) | ![Kernel panic Linux](docs/screenshot-crash-linux.png) |
+| ![Écran de crash Windows (orange)](docs/screenshot-crash-windows.png) | ![Redémarrage macOS](docs/screenshot-crash-mac.png) | ![Kernel panic Linux](docs/screenshot-crash-linux.png) |
 
 ## Architecture
 
@@ -94,7 +94,7 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 | `/?by=Alex` | Formulaire avec le croissanteur pré-rempli |
 | `/croissante?by=Alex` | Vue alternative « CE PC A ÉTÉ CROISSANTÉ » (non liée depuis l'accueil) |
 | `/crash?by=Alex` | Faux écran de crash adapté à l'OS détecté (`with` et `m` = mentions et n° de message) |
-| `/crash?os=mac` | Idem en forçant l'OS (`windows`, `mac`, `linux`, `chromeos`, `ios`, `android`) |
+| `/crash?os=mac` | Idem en forçant l'OS (`windows`, `mac`, `mac-classic`, `linux`, `chromeos`, `ios`, `android`) |
 | `/health` | `{"status":"ok"}` (HTTP 200) |
 | `/config.json` | Configuration publique utilisée par le frontend |
 
@@ -116,8 +116,15 @@ rien n'est envoyé ni enregistré. Il sert à :
 
 - afficher le bon raccourci de verrouillage (`Win + L`, `Ctrl + Cmd + Q`, `Super + L`, `Recherche + L`,
   texte générique sinon) ;
-- choisir l'écran de crash : Windows (et OS inconnu) → écran de crash orange façon Windows ; macOS / iOS → kernel panic multilingue ;
-  Linux / ChromeOS / Android → kernel panic console.
+- choisir l'écran de crash :
+  - Windows (et OS inconnu) → écran de crash orange façon Windows ;
+  - macOS récent / iOS → faux redémarrage (écran noir, logo, barre de progression) puis la fenêtre système
+    « Votre ordinateur a redémarré en raison d'un problème » (Ignorer / Signaler… avec le rapport détaillé) ;
+  - ancien Mac (OS X 10.7 et avant) → kernel panic multilingue d'époque (forçable avec `?os=mac-classic`) ;
+  - Linux / ChromeOS / Android → kernel panic console avec QR code texte.
+
+Côté Mac, seule une très vieille version est détectable : depuis 2020, Safari et Firefox annoncent tous
+« Mac OS X 10.15.7 » quelle que soit la vraie version, donc tout Mac récent reçoit l'écran moderne.
 
 La détection est approximative par nature (un iPad se présente comme un Mac, le user-agent peut être modifié) :
 `?os=` permet de forcer le résultat. Sur Linux, le raccourci dépend de l'environnement de bureau (configurable).

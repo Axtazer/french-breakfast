@@ -140,7 +140,216 @@
   }
 }
 
-/* ---------- macOS ---------- */
+/* ---------- macOS (récent : redémarrage puis fenêtre système) ---------- */
+
+.macos {
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  color: #1d1d1f;
+}
+
+.macos-boot,
+.macos-desktop {
+  position: absolute;
+  inset: 0;
+}
+
+.macos-boot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(28px, 7vh, 72px);
+  background: #000;
+}
+
+.macos-boot-logo {
+  width: clamp(64px, 11vh, 120px);
+  /* Silhouette blanche, façon logo de démarrage. */
+  filter: brightness(0) invert(1);
+}
+
+.macos-boot-bar {
+  width: clamp(140px, 16vw, 220px);
+  height: 5px;
+  overflow: hidden;
+  background: #3a3a3c;
+  border-radius: 3px;
+}
+
+.macos-boot-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: #f5f5f7;
+  border-radius: 3px;
+  transition: width 0.2s linear;
+}
+
+.macos-desktop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(255, 160, 90, 0.85), transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(150, 90, 255, 0.85), transparent 55%),
+    radial-gradient(ellipse at 60% 90%, rgba(40, 120, 255, 0.9), transparent 60%),
+    #2b1d4f;
+  animation: fade-in 0.6s ease-out both;
+}
+
+.macos-menubar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 26px;
+  padding: 0 14px;
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  color: #fff;
+  background: rgba(30, 20, 60, 0.35);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+.macos-menubar-logo {
+  width: 16px;
+  filter: brightness(0) invert(1);
+}
+
+.macos-menubar-spacer {
+  flex: 1;
+}
+
+.macos-dialog {
+  width: min(372px, 100%);
+  max-height: calc(100% - 60px);
+  overflow: auto;
+  padding: 22px 18px 16px;
+  text-align: center;
+  background: rgba(236, 236, 236, 0.86);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.25),
+    0 22px 70px rgba(0, 0, 0, 0.45);
+}
+
+.macos-dialog.is-shaking {
+  animation: macos-shake 0.4s ease-in-out;
+}
+
+.macos-dialog-icon {
+  width: 64px;
+  margin-bottom: 10px;
+}
+
+.macos-dialog-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.macos-dialog-body {
+  margin: 0 0 14px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #3c3c43;
+}
+
+.macos-refused {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #c4291d;
+}
+
+.macos-refused:empty {
+  display: none;
+}
+
+.macos-report {
+  margin: 0 0 12px;
+  text-align: left;
+}
+
+.macos-report-title {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.macos-report pre {
+  max-height: 30vh;
+  margin: 0;
+  padding: 8px;
+  overflow: auto;
+  font-family: ui-monospace, Menlo, 'SF Mono', monospace;
+  font-size: 10px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #fff;
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.macos-dialog-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.macos-btn {
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: #1d1d1f;
+  background: #fff;
+  border: 0;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.2),
+    0 1px 1px rgba(0, 0, 0, 0.12);
+  cursor: default;
+}
+
+.macos-btn-primary {
+  color: #fff;
+  background: linear-gradient(#3b8bfd, #0a6cf1);
+}
+
+@keyframes macos-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-10px);
+  }
+  40%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+@media (max-width: 600px) {
+  .macos-menubar span:not(:last-child) {
+    display: none;
+  }
+}
+
+/* ---------- Ancien macOS (OS X ≤ 10.7) : kernel panic multilingue ---------- */
 
 .macpanic {
   display: flex;
