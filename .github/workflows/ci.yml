@@ -64,8 +64,8 @@ jobs:
             sleep 1
           done
           curl -fsS http://localhost:8080/health | grep -q '"status":"ok"'
-          curl -fsS -o /dev/null "http://localhost:8080/?victim=Lucas&by=Flo"
-          curl -fsS -o /dev/null "http://localhost:8080/croissante?victim=Lucas&by=Flo"
+          curl -fsS -o /dev/null "http://localhost:8080/?by=Alex&with=Camille,Sam"
+          curl -fsS -o /dev/null "http://localhost:8080/croissante?by=Alex"
           test "$(docker exec croissante id -u)" = "1000"
 
       - name: Container logs

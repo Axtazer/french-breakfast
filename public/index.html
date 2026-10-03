@@ -8,59 +8,66 @@
     <title>Croissanté 🥐</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/crash.css" />
     <script type="module" src="js/app.js"></script>
   </head>
   <body class="home">
     <main class="card">
       <header class="brand">
-        <span class="brand-logo" aria-hidden="true">🥐</span>
-        <h1 id="app-name">Croissanté</h1>
-        <p id="tagline" class="tagline">Un PC déverrouillé, des croissants pour toute l’équipe.</p>
+        <img class="brand-logo" src="img/croissant.svg" alt="" width="128" height="128" draggable="false" />
+        <div>
+          <h1 id="app-name">Croissanté</h1>
+          <p id="tagline" class="tagline">Un PC déverrouillé, des croissants pour toute l’équipe.</p>
+        </div>
       </header>
 
       <noscript>
         <p class="notice">JavaScript est nécessaire pour générer le message.</p>
       </noscript>
 
-      <form id="croissant-form" class="form" autocomplete="off" novalidate>
-        <p class="form-hint">
-          Le message part depuis ce poste, donc avec le compte de la victime : il doit avoir l’air écrit par elle.
-        </p>
-
+      <div class="fields">
         <div class="field">
-          <label for="names">Mentionner des collègues ? <span class="optional">(facultatif)</span></label>
-          <input id="names" name="names" type="text" maxlength="300"
-                 placeholder="Damien, Margaux, Sébastien" spellcheck="false" aria-describedby="names-help" />
-          <p id="names-help" class="field-help">Ajoute « Et oui, même pour … ! » à la fin du message.</p>
+          <label for="names">Collègues à citer <span class="optional">(facultatif)</span></label>
+          <input id="names" name="names" type="text" maxlength="300" autocomplete="off"
+                 placeholder="Camille, Sam, Léo" spellcheck="false" aria-describedby="names-help" />
+          <p id="names-help" class="visually-hidden">Ajoute « Et oui, même pour … ! » à la fin du message.</p>
           <div id="presets" class="chips" aria-label="Collègues" hidden></div>
         </div>
 
         <div class="field" id="by-field">
           <label for="by">Qui croissante ? <span class="optional">(facultatif)</span></label>
-          <input id="by" name="by" type="text" maxlength="40" placeholder="Flo" spellcheck="false"
-                 aria-describedby="by-help" />
-          <p id="by-help" class="field-help">Affiché uniquement sur l’écran de croissantage, jamais dans le message.</p>
+          <input id="by" name="by" type="text" maxlength="40" autocomplete="off" placeholder="Alex"
+                 spellcheck="false" aria-describedby="by-help" />
+          <p id="by-help" class="field-help">Affiché sur l’écran de crash, jamais dans le message.</p>
         </div>
+      </div>
 
-        <button type="submit" class="btn btn-primary">🥐 CROISSANTER</button>
-      </form>
-
-      <section id="result" class="result" aria-labelledby="result-title" hidden>
-        <h2 id="result-title" class="visually-hidden">Message généré</h2>
-        <label for="message" class="message-label">Message <span class="optional">(modifiable)</span></label>
-        <textarea id="message" class="message" rows="3" spellcheck="false"></textarea>
+      <section class="result" aria-label="Message">
+        <button type="button" id="message" class="message-box" aria-describedby="copy-feedback">
+          <span id="message-text"></span>
+          <span class="message-hint" aria-hidden="true">Cliquer pour copier</span>
+        </button>
         <div class="actions">
-          <button type="button" id="copy-btn" class="btn btn-secondary">Copier le message</button>
-          <button type="button" id="reroll-btn" class="btn btn-ghost">🎲 Autre message</button>
-          <a id="fullscreen-link" class="btn btn-ghost" href="croissante">🥐 Plein écran</a>
-          <a id="crash-link" class="btn btn-ghost" href="crash">💥 Écran de crash</a>
+          <button type="button" id="copy-btn" class="btn btn-secondary">📋 Copier<span class="wide-only">&nbsp;le message</span></button>
+          <button type="button" id="reroll-btn" class="btn btn-ghost">🎲 Autre<span class="wide-only">&nbsp;message</span></button>
         </div>
         <p id="copy-feedback" class="feedback" role="status" aria-live="polite"></p>
       </section>
+
+      <button type="button" id="croissanter-btn" class="btn btn-primary">🥐 CROISSANTER</button>
     </main>
 
     <footer class="footer">
+      Le message part du compte de la victime : il doit avoir l’air écrit par elle.<br />
       Aucune donnée envoyée ni stockée — tout se passe dans ton navigateur.
     </footer>
+
+    <!-- Écran de crash affiché par CROISSANTER, en plein écran dans le même clic. -->
+    <div id="crash-overlay" hidden>
+      <div id="crash-root" class="crash"></div>
+      <nav class="crash-controls" aria-label="Actions">
+        <button type="button" id="crash-close" class="stage-btn">← Accueil</button>
+      </nav>
+    </div>
   </body>
 </html>
