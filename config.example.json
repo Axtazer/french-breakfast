@@ -1,0 +1,30 @@
+{
+  "appName": "Croissanté",
+  "tagline": "Un PC déverrouillé, des croissants pour toute l’équipe.",
+  "enableByField": true,
+  "messageTemplates": [
+    "Salut tout le monde ! C'est moi qui ramène les croissants au prochain cours du matin.",
+    "Hello ! Petit-déjeuner offert : je ramène les croissants au prochain cours du matin."
+  ],
+  "includeTemplate": "Et oui, même pour {names} !",
+  "fullscreenSubject": "Ce PC",
+  "fullscreenTitle": "A ÉTÉ CROISSANTÉ",
+  "fullscreenByline": "par {by}",
+  "fullscreenSubtitle": "Pense à {shortcut} la prochaine fois.",
+  "fullscreenSubtitleFallback": "Pense à verrouiller ton poste la prochaine fois.",
+  "lockShortcuts": {
+    "windows": "Win + L",
+    "mac": "Ctrl + Cmd + Q",
+    "linux": "Super + L",
+    "chromeos": "Recherche + L"
+  },
+  "enableCrashScreen": true,
+  "crashStopCode": "CROISSANTS_NOT_DELIVERED",
+  "presetNames": [
+    "Damien",
+    "Margaux",
+    "Sébastien"
+  ],
+  "rememberRecentNames": false,
+  "maxNameLength": 40
+}

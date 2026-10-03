@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="no-referrer" />
+    <title>CROISSANTÉ 🥐</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/crash.css" />
+    <script type="module" src="js/crash.js"></script>
+  </head>
+  <body class="crash">
+    <!-- Windows : écran de crash, en orange (signature Croissanté) -->
+    <main id="crash-windows" class="bsod" hidden>
+      <div class="bsod-inner">
+        <p class="bsod-face" aria-hidden="true">:(</p>
+        <h1 class="bsod-lead">
+          Votre PC a rencontré un problème : il a été laissé déverrouillé.
+          <span id="bsod-lead-line"></span>
+        </h1>
+        <p class="bsod-progress"><span id="bsod-percent">0</span>% effectué</p>
+        <div class="bsod-details">
+          <div id="bsod-qr" class="bsod-qr" aria-hidden="true"></div>
+          <div class="bsod-info">
+            <p id="bsod-message" class="bsod-message"></p>
+            <p>Si vous appelez un support technique, donnez-lui ces informations :</p>
+            <p>Code d’arrêt : <span id="bsod-stopcode"></span></p>
+            <p id="bsod-by" hidden></p>
+            <p>Ce qui a échoué : <span id="bsod-hint"></span></p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- macOS : kernel panic multilingue -->
+    <main id="crash-mac" class="macpanic" hidden>
+      <div class="macpanic-box">
+        <div class="macpanic-icon" aria-hidden="true">⏻</div>
+        <h1 id="mac-fr" class="macpanic-text"></h1>
+        <p id="mac-en" class="macpanic-text" lang="en"></p>
+        <p id="mac-de" class="macpanic-text" lang="de"></p>
+        <p id="mac-ja" class="macpanic-text" lang="ja"></p>
+        <p id="mac-message" class="macpanic-message"></p>
+        <p id="mac-hint" class="macpanic-hint"></p>
+      </div>
+    </main>
+
+    <!-- Linux : kernel panic console -->
+    <main id="crash-linux" class="kpanic" hidden>
+      <h1 class="visually-hidden">Kernel panic</h1>
+      <pre id="kpanic-log" class="kpanic-log"></pre>
+    </main>
+
+    <nav class="crash-controls" aria-label="Actions">
+      <a href="./" class="stage-btn">← Accueil</a>
+      <a id="crash-to-stage" href="croissante" class="stage-btn">Vue croissant</a>
+    </nav>
+  </body>
+</html>

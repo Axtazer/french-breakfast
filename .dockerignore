@@ -1,0 +1,5 @@
+# Tout exclure, puis n'autoriser que le nécessaire.
+*
+!package.json
+!src/
+!public/
