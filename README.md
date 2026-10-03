@@ -14,7 +14,7 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
    🎲 pour en changer, mention facultative de collègues (« Et oui, même pour Camille, Sam et Léo ! ») ;
 2. **un clic sur le message le copie** (ou bouton 📋) : le coller dans Teams, Slack… il part **avec le compte de la victime** ;
 3. **🥐 CROISSANTER** : un **faux écran de crash** adapté à l'OS du poste s'affiche aussitôt **en plein écran**
-   (écran de crash Windows version orange, kernel panic macOS ou Linux).
+   (écran de crash Windows version orange, redémarrage « problème » macOS ou kernel panic Linux).
 
 > L'application **n'envoie rien** : elle génère uniquement un message prêt à copier/coller.
 > Aucun compte, aucun secret, aucune intégration Teams/mail.
@@ -27,9 +27,13 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
 
 Écrans de crash (choisis automatiquement selon l'OS) :
 
-| Windows | macOS | Linux |
+| Windows | macOS | Linux (GNOME) |
 | --- | --- | --- |
-| ![Écran de crash Windows (orange)](docs/screenshot-crash-windows.png) | ![Kernel panic macOS](docs/screenshot-crash-mac.png) | ![Kernel panic Linux](docs/screenshot-crash-linux.png) |
+| ![Écran de crash Windows (orange)](docs/screenshot-crash-windows.png) | ![Redémarrage macOS](docs/screenshot-crash-mac.png) | ![Écran GNOME](docs/screenshot-crash-gnome.png) |
+
+| ChromeOS | Linux console (`?os=linux-console`) |
+| --- | --- |
+| ![Récupération ChromeOS](docs/screenshot-crash-chromeos.png) | ![Kernel panic Linux](docs/screenshot-crash-linux.png) |
 
 ## Architecture
 
@@ -94,7 +98,7 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 | `/?by=Alex` | Formulaire avec le croissanteur pré-rempli |
 | `/croissante?by=Alex` | Vue alternative « CE PC A ÉTÉ CROISSANTÉ » (non liée depuis l'accueil) |
 | `/crash?by=Alex` | Faux écran de crash adapté à l'OS détecté (`with` et `m` = mentions et n° de message) |
-| `/crash?os=mac` | Idem en forçant l'OS (`windows`, `mac`, `linux`, `chromeos`, `ios`, `android`) |
+| `/crash?os=mac` | Idem en forçant l'OS (`windows`, `mac`, `mac-classic`, `linux`, `linux-console`, `chromeos`, `ios`, `android`) |
 | `/health` | `{"status":"ok"}` (HTTP 200) |
 | `/config.json` | Configuration publique utilisée par le frontend |
 
@@ -103,6 +107,13 @@ et doit avoir l'air écrit par elle. Le croissanteur n'apparaît jamais dans le 
 seulement sur l'écran de crash.
 
 Le message n'est pas modifiable : il est conçu pour être copié tel quel, sans risque d'erreur de copier-coller.
+
+Raccourcis clavier sur l'accueil :
+
+| Touche | Action |
+| --- | --- |
+| `Ctrl + C` (`⌘ + C` sur Mac) | Copie le message, sans rien sélectionner (une sélection dans un champ se copie normalement) |
+| `Entrée` | 🥐 CROISSANTER : écran de crash en plein écran (sauf si le focus est sur un autre bouton) |
 
 Astuce : mettre `/?by=VotrePrénom` en favori pour croissanter encore plus vite.
 
@@ -116,19 +127,40 @@ rien n'est envoyé ni enregistré. Il sert à :
 
 - afficher le bon raccourci de verrouillage (`Win + L`, `Ctrl + Cmd + Q`, `Super + L`, `Recherche + L`,
   texte générique sinon) ;
-- choisir l'écran de crash : Windows (et OS inconnu) → écran de crash orange façon Windows ; macOS / iOS → kernel panic multilingue ;
-  Linux / ChromeOS / Android → kernel panic console.
+- choisir l'écran de crash :
+  - Windows (et OS inconnu) → écran de crash orange façon Windows ;
+  - macOS récent / iOS → faux redémarrage (écran noir, logo, barre de progression) puis la fenêtre système
+    « Votre ordinateur a redémarré en raison d'un problème » (Ignorer / Signaler… avec le rapport détaillé) ;
+  - ancien Mac (OS X 10.7 et avant) → kernel panic multilingue d'époque (forçable avec `?os=mac-classic`) ;
+  - Linux → écran GNOME « Oh non ! Un problème est survenu et le système ne peut pas se rétablir » ;
+  - ChromeOS → écran de récupération « croissantOS est manquant ou endommagé » ;
+  - Android, ou `?os=linux-console` → kernel panic console avec QR code texte.
+
+Le navigateur ne dit pas si un poste Linux est sous GNOME ou en console : GNOME est donc l'écran par défaut.
+
+Côté Mac, seule une très vieille version est détectable : depuis 2020, Safari et Firefox annoncent tous
+« Mac OS X 10.15.7 » quelle que soit la vraie version, donc tout Mac récent reçoit l'écran moderne.
 
 La détection est approximative par nature (un iPad se présente comme un Mac, le user-agent peut être modifié) :
 `?os=` permet de forcer le résultat. Sur Linux, le raccourci dépend de l'environnement de bureau (configurable).
 
 L'écran de crash affiche le message du croissantage, l'**heure du croissantage**, le croissanteur, le code d'arrêt et
-le raccourci de verrouillage. Sur l'écran Windows, le **QR code** est un vrai QR code qui ouvre
-[les boulangeries à proximité sur Google Maps](https://www.google.com/maps/search/?api=1&query=boulangerie).
-Sur l'écran Linux, le même QR code s'affiche **en texte** (demi-blocs Unicode, façon `qrencode -t UTF8`), comme
-le QR code de l'écran de panic du noyau. Les deux versions sont générées une fois pour toutes par `npm run qr`
-(`scripts/generate-qr.mjs` → `public/img/qr-boulangerie.svg` et `public/js/qr-boulangerie-text.js`) :
-aucune requête externe tant que personne ne le scanne.
+le raccourci de verrouillage. **Chaque écran a son QR code**, un vrai, qui ouvre
+[les boulangeries à proximité sur Google Maps](https://www.google.com/maps/search/?api=1&query=boulangerie),
+placé là où il est crédible :
+
+| Écran | Emplacement du QR code |
+| --- | --- |
+| Windows | À gauche des informations, comme sur un vrai écran bleu (version orange) |
+| macOS récent | Dans le rapport, après « Signaler… » (« Scannez ce code avec votre iPhone… ») |
+| Ancien Mac | « Informations de dépannage » sous le texte |
+| GNOME | « Besoin d'aide ? Scannez ce code… » |
+| ChromeOS | À droite, comme sur le vrai écran de récupération |
+| Console Linux | **En texte** (demi-blocs Unicode, façon `qrencode -t UTF8`), comme l'écran de panic du noyau |
+
+Ils sont générés une fois pour toutes par `npm run qr` (`scripts/generate-qr.mjs` → `public/img/qr-boulangerie.svg`,
+`public/img/qr-boulangerie-dark.svg` et `public/js/qr-boulangerie-text.js`) : aucune requête externe tant que
+personne ne le scanne.
 
 Comme un vrai écran de crash, rien n'y est sélectionnable ni copiable (sélection, Ctrl + C et clic droit bloqués),
 et **un clic n'importe où repasse en plein écran** (par exemple après Échap).

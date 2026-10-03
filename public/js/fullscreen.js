@@ -17,7 +17,7 @@ async function init() {
     $('stage-by').textContent = renderTemplate(config.fullscreenByline, { by: shownBy });
     $('stage-by').hidden = false;
   }
-  document.title = `${config.fullscreenSubject} ${config.fullscreenTitle.toLowerCase()} 🥐`;
+  document.title = `${config.fullscreenSubject} ${config.fullscreenTitle.toLowerCase()}`;
 
   // Vrai plein écran uniquement sur action explicite de l'utilisateur.
   const fsButton = $('fs-btn');

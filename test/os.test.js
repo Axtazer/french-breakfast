@@ -18,17 +18,29 @@ test('detectOS reconnaît les principaux user-agents', () => {
   }
   assert.equal(detectOS({}), 'unknown');
   assert.equal(detectOS({ userAgent: 'curl/8.0' }), 'unknown');
+  // Ancien Mac (OS X ≤ 10.7) : écran classique ; 10_15_7 (valeur figée des navigateurs récents) : moderne.
+  assert.equal(detectOS({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/534.57' }), 'mac-classic');
+  assert.equal(detectOS({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:48.0) Gecko/20100101' }), 'mac-classic');
+  assert.equal(detectOS({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36' }), 'mac');
 });
 
 test('detectOS privilégie userAgentData.platform', () => {
   assert.equal(detectOS({ userAgentData: { platform: 'macOS' }, userAgent: UA.windows }), 'mac');
   assert.equal(detectOS({ userAgentData: { platform: 'Windows' }, userAgent: '' }), 'windows');
+  assert.equal(
+    detectOS({ userAgentData: { platform: 'macOS' }, userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5)' }),
+    'mac-classic',
+  );
 });
 
 test('parseOSParam applique une liste blanche', () => {
   assert.equal(parseOSParam('mac'), 'mac');
   assert.equal(parseOSParam(' MacOS '), 'mac');
   assert.equal(parseOSParam('win'), 'windows');
+  assert.equal(parseOSParam('mac-classic'), 'mac-classic');
+  assert.equal(parseOSParam('linux-console'), 'linux-console');
+  assert.equal(parseOSParam('console'), 'linux-console');
+  assert.equal(parseOSParam('gnome'), 'linux');
   assert.equal(parseOSParam('<script>'), null);
   assert.equal(parseOSParam(null), null);
 });
@@ -42,7 +54,10 @@ test('lockHint affiche le bon raccourci, ou le texte de repli', () => {
   assert.equal(lockHint(DEFAULT_CONFIG, 'windows'), 'Pense à Win + L la prochaine fois.');
   assert.equal(lockHint(DEFAULT_CONFIG, 'mac'), 'Pense à Ctrl + Cmd + Q la prochaine fois.');
   assert.equal(lockHint(DEFAULT_CONFIG, 'linux'), 'Pense à Super + L la prochaine fois.');
+  assert.equal(lockHint(DEFAULT_CONFIG, 'linux-console'), 'Pense à Super + L la prochaine fois.');
   assert.equal(lockHint(DEFAULT_CONFIG, 'ios'), 'Pense à verrouiller ton poste la prochaine fois.');
+  // Ctrl + Cmd + Q n'existe pas avant macOS 10.13 : texte générique.
+  assert.equal(lockHint(DEFAULT_CONFIG, 'mac-classic'), 'Pense à verrouiller ton poste la prochaine fois.');
   assert.equal(lockHint(DEFAULT_CONFIG, 'unknown'), 'Pense à verrouiller ton poste la prochaine fois.');
 });
 
@@ -51,7 +66,9 @@ test('crashTheme associe chaque OS à un écran', () => {
   assert.equal(crashTheme('unknown'), 'windows');
   assert.equal(crashTheme('mac'), 'mac');
   assert.equal(crashTheme('ios'), 'mac');
-  assert.equal(crashTheme('linux'), 'linux');
-  assert.equal(crashTheme('chromeos'), 'linux');
+  assert.equal(crashTheme('mac-classic'), 'mac-classic');
+  assert.equal(crashTheme('linux'), 'gnome');
+  assert.equal(crashTheme('linux-console'), 'linux');
+  assert.equal(crashTheme('chromeos'), 'chromeos');
   assert.equal(crashTheme('android'), 'linux');
 });

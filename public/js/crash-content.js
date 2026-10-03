@@ -16,7 +16,35 @@ export function windowsCrash(ctx) {
   };
 }
 
+/**
+ * macOS récent : pas d'écran de panic, le Mac "redémarre" puis affiche la fenêtre système
+ * « Votre ordinateur a redémarré en raison d'un problème ».
+ */
 export function macCrash(ctx) {
+  const report = [
+    `panic(cpu 0 caller 0xfffffe0042420000): "croissant supply exhausted" @croissantd.c:42`,
+    `Heure du croissantage : ${ctx.time}`,
+  ];
+  if (ctx.by) report.push(`Croissanté par : ${ctx.by}`);
+  report.push(
+    `Code d’arrêt : ${ctx.stopCode}`,
+    'Processus fautif : session déverrouillée',
+    `Message : ${ctx.message}`,
+    `Conseil : ${ctx.hint}`,
+  );
+  return {
+    title: 'Votre ordinateur a redémarré en raison d’un problème.',
+    body: 'Cliquez sur Signaler pour afficher plus de détails et envoyer un rapport à la boulangerie la plus proche.',
+    ignore: 'Ignorer',
+    report: 'Signaler…',
+    ignoreRefused: 'Impossible d’ignorer ce problème : des croissants sont attendus.',
+    reportTitle: 'Rapport de problème',
+    reportLines: report,
+  };
+}
+
+/** Ancien macOS (OS X 10.7 et avant) : kernel panic multilingue sur voile gris. */
+export function macClassicCrash(ctx) {
   return {
     fr: 'Vous devez apporter des croissants. Ce poste a été laissé déverrouillé.',
     en: 'You need to bring croissants. This computer was left unlocked.',
@@ -52,11 +80,57 @@ export function linuxCrash(ctx) {
   return lines;
 }
 
+/** Linux de bureau (GNOME) : l'écran « Oh non ! Un problème est survenu… ». */
+export function gnomeCrash(ctx) {
+  const details = [`Heure du croissantage : ${ctx.time}`];
+  if (ctx.by) details.push(`Croissanté par : ${ctx.by}`);
+  details.push(`Code d’arrêt : ${ctx.stopCode}`);
+  return {
+    title: 'Oh non ! Un problème est survenu et le système ne peut pas se rétablir.',
+    body: 'Veuillez ramener des croissants, puis vous déconnecter et réessayer.',
+    message: ctx.message,
+    details,
+    hint: ctx.hint,
+    qrCaption: 'Besoin d’aide ? Scannez ce code pour trouver une boulangerie à proximité.',
+    button: 'Fermer la session',
+    refused: 'Impossible de fermer la session : des croissants sont attendus.',
+  };
+}
+
+/** ChromeOS : l'écran de récupération « ChromeOS est manquant ou endommagé » (avec son QR code). */
+export function chromeosCrash(ctx) {
+  const details = [`Heure du croissantage : ${ctx.time}`];
+  if (ctx.by) details.push(`Croissanté par : ${ctx.by}`);
+  details.push(`Code d’erreur : ${ctx.stopCode}`);
+  return {
+    brand: 'croissantOS',
+    title: 'croissantOS est manquant ou endommagé.',
+    body: 'Veuillez ramener des croissants à toute l’équipe, puis lancer la récupération.',
+    message: ctx.message,
+    details,
+    hint: ctx.hint,
+    qrCaption: 'Pour en savoir plus, scannez ce code avec votre téléphone.',
+    primary: 'Lancer la récupération',
+    secondary: 'Options avancées',
+    refused: 'Récupération impossible : aucun croissant détecté.',
+  };
+}
+
 /** Heure du croissantage au format français : "15h42". */
 export function formatCrashTime(date = new Date()) {
   const hh = String(date.getHours()).padStart(2, '0');
   const mm = String(date.getMinutes()).padStart(2, '0');
   return `${hh}h${mm}`;
+}
+
+const DAYS = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
+const MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+
+/** Date de la barre de menus macOS : "sam. 3 oct. 16:12". */
+export function formatMenuBarDate(date = new Date()) {
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${DAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]} ${hh}:${mm}`;
 }
 
 /** Cible du QR code de l'écran Windows (image statique générée par `npm run qr`). */
