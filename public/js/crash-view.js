@@ -1,6 +1,6 @@
 // Rendu DOM des écrans de crash, partagé par /crash et par l'accueil (bouton CROISSANTER).
 // Tout le texte passe par textContent : aucune donnée n'est interprétée comme du HTML.
-import { fakeQrMatrix, linuxCrash, macCrash, windowsCrash } from './crash-content.js';
+import { linuxCrash, macCrash, windowsCrash } from './crash-content.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -20,10 +20,13 @@ function windowsScreen(ctx, timers) {
   const percent = el('span', {}, '0');
   const progress = el('p', { className: 'bsod-progress' }, percent, '% effectué');
 
-  const qr = el('div', { className: 'bsod-qr', attrs: { 'aria-hidden': 'true' } });
-  for (const row of fakeQrMatrix(`croissant|${ctx.by}`)) {
-    for (const on of row) qr.append(el('span', on ? { className: 'on' } : {}));
-  }
+  // Vrai QR code (image statique, cf. scripts/generate-qr.mjs) : boulangeries à proximité.
+  const qr = el('img', {
+    className: 'bsod-qr',
+    src: 'img/qr-boulangerie.svg',
+    alt: 'QR code : trouver une boulangerie à proximité',
+    draggable: false,
+  });
 
   const screen = el(
     'div',
@@ -49,6 +52,7 @@ function windowsScreen(ctx, timers) {
           el('p', { className: 'bsod-message' }, text.message),
           el('p', {}, 'Si vous appelez un support technique, donnez-lui ces informations :'),
           el('p', {}, `Code d’arrêt : ${text.stopCode}`),
+          el('p', {}, text.time),
           text.by ? el('p', {}, text.by) : null,
           el('p', {}, `Ce qui a échoué : ${text.hint}`),
         ),
@@ -92,7 +96,7 @@ function macScreen(ctx) {
       el('p', { className: 'macpanic-text', lang: 'de' }, text.de),
       el('p', { className: 'macpanic-text', lang: 'ja' }, text.ja),
       el('p', { className: 'macpanic-message' }, text.message),
-      el('p', { className: 'macpanic-hint' }, text.hint),
+      el('p', { className: 'macpanic-hint' }, `${text.time} · ${text.hint}`),
     ),
   );
 }

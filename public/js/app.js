@@ -1,4 +1,5 @@
 import { loadConfig } from './config.js';
+import { formatCrashTime } from './crash-content.js';
 import { hideIdleCursor, mountCrash } from './crash-view.js';
 import { buildMessage, parseNames, pickTemplateIndex, readParams, sanitizeName } from './message.js';
 import { crashTheme, lockHint, resolveOS } from './os.js';
@@ -161,6 +162,7 @@ async function init() {
       message: currentMessage(),
       hint: lockHint(config, os),
       stopCode: config.crashStopCode,
+      time: formatCrashTime(),
     });
     const showCursor = hideIdleCursor(overlay);
     cleanup = () => {

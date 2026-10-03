@@ -62,6 +62,7 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 │   ├── crash.html              # faux écran de crash selon l'OS
 │   ├── css/style.css, css/crash.css
 │   ├── img/croissant.svg       # logo
+│   ├── img/qr-boulangerie.svg  # QR code de l'écran de crash (généré)
 │   └── js/
 │       ├── app.js              # logique de la page d'accueil
 │       ├── fullscreen.js       # logique de la vue alternative
@@ -72,6 +73,7 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 │       ├── message.js          # logique pure (templates, nettoyage) — testée
 │       ├── config.js           # chargement de /config.json
 │       └── defaults.js         # configuration par défaut (partagée avec le serveur)
+├── scripts/generate-qr.mjs     # régénère le QR code (npm run qr)
 ├── src/
 │   ├── server.js               # serveur HTTP
 │   ├── config.js               # chargement de la config (défauts < CONFIG_FILE < env)
@@ -119,7 +121,11 @@ rien n'est envoyé ni enregistré. Il sert à :
 La détection est approximative par nature (un iPad se présente comme un Mac, le user-agent peut être modifié) :
 `?os=` permet de forcer le résultat. Sur Linux, le raccourci dépend de l'environnement de bureau (configurable).
 
-L'écran de crash affiche le message du croissantage (croissanteur, code d'arrêt, raccourci).
+L'écran de crash affiche le message du croissantage, l'**heure du croissantage**, le croissanteur, le code d'arrêt et
+le raccourci de verrouillage. Sur l'écran Windows, le **QR code** est un vrai QR code qui ouvre
+[les boulangeries à proximité sur Google Maps](https://www.google.com/maps/search/?api=1&query=boulangerie).
+C'est une image statique (`public/img/qr-boulangerie.svg`) générée par `npm run qr` (`scripts/generate-qr.mjs`) :
+aucune requête externe tant que personne ne le scanne.
 Depuis l'accueil, **🥐 CROISSANTER** l'affiche dans la même page et appelle `requestFullscreen()` dans le même clic :
 c'est ce geste utilisateur qui autorise le plein écran (aucun contournement des restrictions navigateur).
 En accès direct à `/crash`, le navigateur exige un clic : un clic n'importe où passe alors en plein écran.
@@ -135,7 +141,7 @@ si tout échoue un message invite à copier manuellement.
 Prérequis : Node.js ≥ 22.
 
 ```bash
-npm install      # dépendances de dev uniquement (ESLint)
+npm install      # dépendances de dev uniquement (ESLint, qrcode)
 npm run dev      # http://localhost:8080, redémarre à chaque modification
 ```
 
@@ -146,6 +152,7 @@ npm start        # lancement simple
 npm run lint     # ESLint
 npm test         # tests (node --test)
 npm run check    # lint + tests (avant chaque push)
+npm run qr       # régénère le QR code de l'écran de crash
 ```
 
 ## Docker

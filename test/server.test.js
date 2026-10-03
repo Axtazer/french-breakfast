@@ -52,6 +52,12 @@ test('GET /crash sert l’écran de crash', async () => {
   assert.match(await res.text(), /crash-root/);
 });
 
+test('le QR code statique de l’écran de crash est servi', async () => {
+  const res = await fetch(`${base}/img/qr-boulangerie.svg`);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get('content-type'), /image\/svg\+xml/);
+});
+
 test('GET /config.json expose la configuration publique', async () => {
   const res = await fetch(`${base}/config.json`);
   assert.equal(res.status, 200);

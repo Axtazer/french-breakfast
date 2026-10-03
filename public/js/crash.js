@@ -1,4 +1,5 @@
 import { loadConfig } from './config.js';
+import { formatCrashTime } from './crash-content.js';
 import { hideIdleCursor, mountCrash } from './crash-view.js';
 import { buildMessage, fullscreenHref, readParams } from './message.js';
 import { crashTheme, lockHint, resolveOS } from './os.js';
@@ -22,6 +23,7 @@ async function init() {
     message: buildMessage(config, index, names),
     hint: lockHint(config, os),
     stopCode: config.crashStopCode,
+    time: formatCrashTime(),
   });
   hideIdleCursor(document.body);
 
