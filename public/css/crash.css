@@ -35,10 +35,13 @@
 
 /* ---------- Windows ---------- */
 
+/* Orange (et non bleu) : la signature de Croissanté. Contraste texte blanc ≈ 4,1:1. */
 .bsod {
+  --bsod-bg: #dc4c00;
+
   display: flex;
   align-items: center;
-  background: #0078d7;
+  background: var(--bsod-bg);
   color: #fff;
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
@@ -99,7 +102,7 @@
 }
 
 .bsod-qr .on {
-  background: #0078d7;
+  background: var(--bsod-bg);
 }
 
 @media (max-width: 600px), (max-height: 500px) {

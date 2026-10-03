@@ -9,7 +9,7 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
 2. cliquer sur **🥐 CROISSANTER** ;
 3. **copier** le message généré et le coller dans Teams, Slack, un mail… ;
 4. afficher la page **CROISSANTÉ** en plein écran sur le poste concerné,
-   ou un **faux écran de crash** adapté à l'OS de la victime (écran bleu Windows, kernel panic macOS ou Linux).
+   ou un **faux écran de crash** adapté à l'OS de la victime (écran de crash Windows version orange, kernel panic macOS ou Linux).
 
 > L'application **n'envoie rien** : elle génère uniquement un message prêt à copier/coller.
 > Aucun compte, aucun secret, aucune intégration Teams/mail.
@@ -24,7 +24,7 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
 
 | Windows | macOS | Linux |
 | --- | --- | --- |
-| ![Écran bleu](docs/screenshot-crash-windows.png) | ![Kernel panic macOS](docs/screenshot-crash-mac.png) | ![Kernel panic Linux](docs/screenshot-crash-linux.png) |
+| ![Écran de crash Windows (orange)](docs/screenshot-crash-windows.png) | ![Kernel panic macOS](docs/screenshot-crash-mac.png) | ![Kernel panic Linux](docs/screenshot-crash-linux.png) |
 
 ## Architecture
 
@@ -96,7 +96,7 @@ rien n'est envoyé ni enregistré. Il sert à :
 
 - afficher le bon raccourci de verrouillage (`Win + L`, `Ctrl + Cmd + Q`, `Super + L`, `Recherche + L`,
   texte générique sinon) ;
-- choisir l'écran de crash : Windows (et OS inconnu) → écran bleu ; macOS / iOS → kernel panic multilingue ;
+- choisir l'écran de crash : Windows (et OS inconnu) → écran de crash orange façon Windows ; macOS / iOS → kernel panic multilingue ;
   Linux / ChromeOS / Android → kernel panic console.
 
 La détection est approximative par nature (un iPad se présente comme un Mac, le user-agent peut être modifié) :
