@@ -61,7 +61,7 @@ async function copyText(text) {
 function applyBranding(config) {
   $('app-name').textContent = config.appName;
   $('tagline').textContent = config.tagline;
-  document.title = `${config.appName} 🥐`;
+  document.title = config.appName;
   $('by-field').hidden = !config.enableByField;
   $('reroll-btn').hidden = config.messageTemplates.length < 2;
   $('by').maxLength = config.maxNameLength;
