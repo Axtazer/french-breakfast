@@ -94,7 +94,7 @@ function setupInteractions() {
 
 async function init() {
   const config = await loadConfig();
-  const { by: rawBy } = readParams(window.location.search, config.maxNameLength);
+  const { by: rawBy, names, index } = readParams(window.location.search, config.maxNameLength);
   const by = config.enableByField ? rawBy : '';
 
   if (!config.enableCrashScreen) {
@@ -106,7 +106,7 @@ async function init() {
   const theme = crashTheme(os);
   const ctx = {
     by,
-    message: buildMessage(config, by),
+    message: buildMessage(config, index, names),
     hint: lockHint(config, os),
     stopCode: config.crashStopCode,
   };

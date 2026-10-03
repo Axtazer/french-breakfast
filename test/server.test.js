@@ -57,7 +57,7 @@ test('GET /config.json expose la configuration publique', async () => {
   assert.equal(res.status, 200);
   const config = await res.json();
   assert.equal(config.appName, 'Test 🥐');
-  assert.equal(typeof config.messageTemplate, 'string');
+  assert.ok(Array.isArray(config.messageTemplates) && config.messageTemplates.length > 0);
 });
 
 test('les assets statiques sont servis avec le bon type et un ETag', async () => {

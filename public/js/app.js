@@ -1,8 +1,16 @@
 import { loadConfig } from './config.js';
-import { buildMessage, crashHref, fullscreenHref, readParams, sanitizeName } from './message.js';
+import {
+  buildMessage,
+  crashHref,
+  fullscreenHref,
+  parseNames,
+  pickTemplateIndex,
+  readParams,
+  sanitizeName,
+} from './message.js';
 
 const RECENT_KEY = 'croissante.recentNames';
-const MAX_RECENT = 6;
+const MAX_RECENT = 8;
 
 const $ = (id) => document.getElementById(id);
 
@@ -17,9 +25,9 @@ function readRecent(config) {
   }
 }
 
-function rememberName(config, name) {
-  if (!config.rememberRecentNames) return;
-  const list = [name, ...readRecent(config).filter((n) => n !== name)].slice(0, MAX_RECENT);
+function rememberNames(config, names) {
+  if (!config.rememberRecentNames || names.length === 0) return;
+  const list = [...new Set([...names, ...readRecent(config)])].slice(0, MAX_RECENT);
   try {
     localStorage.setItem(RECENT_KEY, JSON.stringify(list));
   } catch {
@@ -27,22 +35,27 @@ function rememberName(config, name) {
   }
 }
 
+/** Collègues proposés en raccourci : un clic ajoute/retire le nom du champ "Mentionner". */
 function renderChips(config) {
   const container = $('presets');
-  const names = config.enableByField
-    ? [...new Set([...readRecent(config), ...config.presetNames])]
-        .map((n) => sanitizeName(n, config.maxNameLength))
-        .filter(Boolean)
-    : [];
+  const input = $('names');
+  const names = [...new Set([...readRecent(config), ...config.presetNames])]
+    .map((n) => sanitizeName(n, config.maxNameLength))
+    .filter(Boolean);
+  const selected = parseNames(input.value, config.maxNameLength);
+
   container.replaceChildren();
   for (const name of names) {
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.className = 'chip';
     chip.textContent = name;
+    chip.setAttribute('aria-pressed', String(selected.includes(name)));
     chip.addEventListener('click', () => {
-      $('by').value = name;
-      document.querySelector('.btn-primary').focus();
+      const current = parseNames(input.value, config.maxNameLength);
+      const next = current.includes(name) ? current.filter((n) => n !== name) : [...current, name];
+      input.value = next.join(', ');
+      renderChips(config);
     });
     container.append(chip);
   }
@@ -75,38 +88,65 @@ function applyBranding(config) {
   document.title = `${config.appName} 🥐`;
   $('by-field').hidden = !config.enableByField;
   $('crash-link').hidden = !config.enableCrashScreen;
+  $('reroll-btn').hidden = config.messageTemplates.length < 2;
   $('by').maxLength = config.maxNameLength;
 }
 
 async function init() {
   const config = await loadConfig();
   applyBranding(config);
-  renderChips(config);
 
   const form = $('croissant-form');
+  const namesInput = $('names');
   const byInput = $('by');
-  const result = $('result');
   const message = $('message');
   const feedback = $('copy-feedback');
 
-  if (config.enableByField) byInput.value = readParams(window.location.search, config.maxNameLength).by;
+  const params = readParams(window.location.search, config.maxNameLength);
+  namesInput.value = params.names.join(', ');
+  if (config.enableByField) byInput.value = params.by;
+  renderChips(config);
   form.querySelector('.btn-primary').focus();
+
+  const state = { index: -1, names: [], by: '' };
+
+  // La zone de message s'adapte à la longueur du texte.
+  const autosize = () => {
+    message.style.height = 'auto';
+    message.style.height = `${message.scrollHeight + 2}px`;
+  };
+  message.addEventListener('input', autosize);
+
+  const render = () => {
+    message.value = buildMessage(config, state.index, state.names);
+    autosize();
+    $('fullscreen-link').href = fullscreenHref(state.by);
+    $('crash-link').href = crashHref(state);
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+  };
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const by = config.enableByField ? sanitizeName(byInput.value, config.maxNameLength) : '';
-    byInput.value = by;
+    state.names = parseNames(namesInput.value, config.maxNameLength);
+    state.by = config.enableByField ? sanitizeName(byInput.value, config.maxNameLength) : '';
+    state.index = pickTemplateIndex(config.messageTemplates.length, state.index);
+    namesInput.value = state.names.join(', ');
+    byInput.value = state.by;
 
-    message.value = buildMessage(config, by);
-    $('fullscreen-link').href = fullscreenHref(by);
-    $('crash-link').href = crashHref(by);
-    feedback.textContent = '';
-    feedback.className = 'feedback';
-    result.hidden = false;
+    $('result').hidden = false;
+    render();
     $('copy-btn').focus();
 
-    if (by) rememberName(config, by);
+    rememberNames(config, state.names);
     renderChips(config);
+  });
+
+  namesInput.addEventListener('input', () => renderChips(config));
+
+  $('reroll-btn').addEventListener('click', () => {
+    state.index = pickTemplateIndex(config.messageTemplates.length, state.index);
+    render();
   });
 
   $('copy-btn').addEventListener('click', async () => {

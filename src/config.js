@@ -6,8 +6,7 @@ export { DEFAULT_CONFIG };
 const STRING_KEYS = [
   'appName',
   'tagline',
-  'messageTemplate',
-  'messageTemplateAnonymous',
+  'includeTemplate',
   'fullscreenSubject',
   'fullscreenTitle',
   'fullscreenByline',
@@ -23,8 +22,8 @@ const ENV_MAP = {
   APP_NAME: 'appName',
   APP_TAGLINE: 'tagline',
   ENABLE_BY_FIELD: 'enableByField',
-  MESSAGE_TEMPLATE: 'messageTemplate',
-  MESSAGE_TEMPLATE_ANONYMOUS: 'messageTemplateAnonymous',
+  MESSAGE_TEMPLATES: 'messageTemplates',
+  INCLUDE_TEMPLATE: 'includeTemplate',
   FULLSCREEN_SUBJECT: 'fullscreenSubject',
   FULLSCREEN_TITLE: 'fullscreenTitle',
   FULLSCREEN_BYLINE: 'fullscreenByline',
@@ -64,11 +63,11 @@ function parseShortcuts(value) {
   return result;
 }
 
-function parseList(value) {
-  const list = Array.isArray(value) ? value : String(value).split(',');
+function parseList(value, separator = ',', maxItemLength = 100) {
+  const list = Array.isArray(value) ? value : String(value).split(separator);
   return list
     .filter((item) => typeof item === 'string')
-    .map((item) => item.trim())
+    .map((item) => item.trim().slice(0, maxItemLength))
     .filter(Boolean)
     .slice(0, 30);
 }
@@ -85,6 +84,11 @@ function normalize(key, value) {
       return parseBoolean(value);
     case 'presetNames':
       return parseList(value);
+    case 'messageTemplates': {
+      // Séparateur "|" dans l'environnement : les messages contiennent souvent des virgules.
+      const list = parseList(value, '|', 500);
+      return list.length > 0 ? list : undefined;
+    }
     case 'lockShortcuts':
       return parseShortcuts(value);
     case 'maxNameLength': {

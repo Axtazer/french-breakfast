@@ -24,13 +24,22 @@
 
       <form id="croissant-form" class="form" autocomplete="off" novalidate>
         <p class="form-hint">
-          Le message sera envoyé depuis ce poste, donc avec le compte de la victime : pas besoin de son nom.
+          Le message part depuis ce poste, donc avec le compte de la victime : il doit avoir l’air écrit par elle.
         </p>
+
+        <div class="field">
+          <label for="names">Mentionner des collègues ? <span class="optional">(facultatif)</span></label>
+          <input id="names" name="names" type="text" maxlength="300"
+                 placeholder="Damien, Margaux, Sébastien" spellcheck="false" aria-describedby="names-help" />
+          <p id="names-help" class="field-help">Ajoute « Et oui, même pour … ! » à la fin du message.</p>
+          <div id="presets" class="chips" aria-label="Collègues" hidden></div>
+        </div>
 
         <div class="field" id="by-field">
           <label for="by">Qui croissante ? <span class="optional">(facultatif)</span></label>
-          <input id="by" name="by" type="text" maxlength="40" placeholder="Flo" spellcheck="false" />
-          <div id="presets" class="chips" aria-label="Noms rapides" hidden></div>
+          <input id="by" name="by" type="text" maxlength="40" placeholder="Flo" spellcheck="false"
+                 aria-describedby="by-help" />
+          <p id="by-help" class="field-help">Affiché uniquement sur l’écran de croissantage, jamais dans le message.</p>
         </div>
 
         <button type="submit" class="btn btn-primary">🥐 CROISSANTER</button>
@@ -38,11 +47,12 @@
 
       <section id="result" class="result" aria-labelledby="result-title" hidden>
         <h2 id="result-title" class="visually-hidden">Message généré</h2>
-        <label for="message" class="visually-hidden">Message à copier</label>
-        <textarea id="message" class="message" rows="3" readonly></textarea>
+        <label for="message" class="message-label">Message <span class="optional">(modifiable)</span></label>
+        <textarea id="message" class="message" rows="3" spellcheck="false"></textarea>
         <div class="actions">
           <button type="button" id="copy-btn" class="btn btn-secondary">Copier le message</button>
-          <a id="fullscreen-link" class="btn btn-ghost" href="croissante">Afficher en plein écran</a>
+          <button type="button" id="reroll-btn" class="btn btn-ghost">🎲 Autre message</button>
+          <a id="fullscreen-link" class="btn btn-ghost" href="croissante">🥐 Plein écran</a>
           <a id="crash-link" class="btn btn-ghost" href="crash">💥 Écran de crash</a>
         </div>
         <p id="copy-feedback" class="feedback" role="status" aria-live="polite"></p>

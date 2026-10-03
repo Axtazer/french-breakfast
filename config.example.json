@@ -2,8 +2,11 @@
   "appName": "Croissanté",
   "tagline": "Un PC déverrouillé, des croissants pour toute l’équipe.",
   "enableByField": true,
-  "messageTemplate": "🥐 J’ai laissé mon PC déverrouillé et {by} m’a croissanté : je ramène les croissants à toute l’équipe !",
-  "messageTemplateAnonymous": "🥐 J’ai laissé mon PC déverrouillé : je ramène les croissants à toute l’équipe !",
+  "messageTemplates": [
+    "Salut tout le monde ! C'est moi qui ramène les croissants au prochain cours du matin.",
+    "Hello ! Petit-déjeuner offert : je ramène les croissants au prochain cours du matin."
+  ],
+  "includeTemplate": "Et oui, même pour {names} !",
   "fullscreenSubject": "Ce PC",
   "fullscreenTitle": "A ÉTÉ CROISSANTÉ",
   "fullscreenByline": "par {by}",
@@ -18,8 +21,9 @@
   "enableCrashScreen": true,
   "crashStopCode": "CROISSANTS_NOT_DELIVERED",
   "presetNames": [
-    "Flo",
-    "Sam"
+    "Damien",
+    "Margaux",
+    "Sébastien"
   ],
   "rememberRecentNames": false,
   "maxNameLength": 40

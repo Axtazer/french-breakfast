@@ -19,7 +19,7 @@ test('les variables d’environnement surchargent la config', () => {
       PRESET_NAMES: ' Lucas, Flo ,,Sam ',
       REMEMBER_RECENT_NAMES: 'true',
       MAX_NAME_LENGTH: '20',
-      MESSAGE_TEMPLATE: 'Croissanté par {by} !',
+      MESSAGE_TEMPLATES: "Salut ! Je ramène les croissants, promis.| |Hello ! C'est pour moi.",
     },
     quiet,
   );
@@ -28,7 +28,7 @@ test('les variables d’environnement surchargent la config', () => {
   assert.deepEqual(config.presetNames, ['Lucas', 'Flo', 'Sam']);
   assert.equal(config.rememberRecentNames, true);
   assert.equal(config.maxNameLength, 20);
-  assert.equal(config.messageTemplate, 'Croissanté par {by} !');
+  assert.deepEqual(config.messageTemplates, ['Salut ! Je ramène les croissants, promis.', "Hello ! C'est pour moi."]);
 });
 
 test('les valeurs invalides sont ignorées', () => {
@@ -62,4 +62,8 @@ test('ENABLE_CRASH_SCREEN et CRASH_STOP_CODE', () => {
   const config = loadConfig({ ENABLE_CRASH_SCREEN: 'false', CRASH_STOP_CODE: 'PAIN_AU_CHOCOLAT' }, quiet);
   assert.equal(config.enableCrashScreen, false);
   assert.equal(config.crashStopCode, 'PAIN_AU_CHOCOLAT');
+});
+
+test('MESSAGE_TEMPLATES vide est ignoré', () => {
+  assert.deepEqual(loadConfig({ MESSAGE_TEMPLATES: ' | ' }, quiet).messageTemplates, DEFAULT_CONFIG.messageTemplates);
 });
