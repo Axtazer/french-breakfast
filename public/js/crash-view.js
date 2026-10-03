@@ -1,6 +1,7 @@
 // Rendu DOM des écrans de crash, partagé par /crash et par l'accueil (bouton CROISSANTER).
 // Tout le texte passe par textContent : aucune donnée n'est interprétée comme du HTML.
 import { linuxCrash, macCrash, windowsCrash } from './crash-content.js';
+import { QR_TEXT } from './qr-boulangerie-text.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -104,10 +105,21 @@ function macScreen(ctx) {
 function linuxScreen(ctx, timers) {
   const lines = linuxCrash(ctx);
   const log = el('pre', { className: 'kpanic-log' });
+  // QR code en texte (demi-blocs Unicode), comme l'écran de panic du noyau ou `qrencode -t UTF8`.
+  const qr = el('pre', {
+    className: 'kpanic-qr',
+    attrs: { role: 'img', 'aria-label': 'QR code : trouver une boulangerie à proximité' },
+  });
   const cursor = el('span', { className: 'kpanic-cursor' }, '_');
+  const finish = () => {
+    qr.textContent = QR_TEXT;
+    log.after(qr);
+    qr.after(el('pre', { className: 'kpanic-log' }, cursor));
+  };
 
   if (reduceMotion()) {
-    log.append(`${lines.join('\n')}\n`, cursor);
+    log.append(`${lines.join('\n')}\n`);
+    finish();
   } else {
     let i = 0;
     const timer = setInterval(() => {
@@ -115,13 +127,17 @@ function linuxScreen(ctx, timers) {
       i += 1;
       if (i === lines.length) {
         clearInterval(timer);
-        log.append(cursor);
+        finish();
       }
     }, 160);
     timers.push(timer);
   }
   return el('div', { className: 'kpanic' }, el('h1', { className: 'visually-hidden' }, 'Kernel panic'), log);
 }
+
+// Comme un vrai écran de crash : rien à sélectionner, copier ou ouvrir au clic droit.
+const blockEvent = (event) => event.preventDefault();
+const BLOCKED_EVENTS = ['copy', 'cut', 'contextmenu', 'selectstart', 'dragstart'];
 
 /**
  * Affiche l'écran de crash du thème donné dans `root` (vidé au préalable).
@@ -136,6 +152,27 @@ export function mountCrash(root, theme, ctx) {
     for (const timer of timers) clearInterval(timer);
     root.replaceChildren();
   };
+}
+
+/** Bloque sélection, copie et clic droit sur toute la page tant que l'écran de crash est affiché. */
+export function blockCopy(target = document) {
+  for (const type of BLOCKED_EVENTS) target.addEventListener(type, blockEvent);
+  return () => {
+    for (const type of BLOCKED_EVENTS) target.removeEventListener(type, blockEvent);
+  };
+}
+
+/**
+ * Un clic sur l'écran de crash (hors boutons) passe en plein écran.
+ * Toujours sur un geste de l'utilisateur, comme l'exigent les navigateurs.
+ */
+export function fullscreenOnClick(target) {
+  const onClick = (event) => {
+    if (event.target.closest('a, button') || document.fullscreenElement || !document.fullscreenEnabled) return;
+    document.documentElement.requestFullscreen().catch(() => {});
+  };
+  target.addEventListener('click', onClick);
+  return () => target.removeEventListener('click', onClick);
 }
 
 /** Masque le curseur après quelques secondes d'inactivité, pour l'illusion. */

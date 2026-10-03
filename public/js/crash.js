@@ -1,6 +1,6 @@
 import { loadConfig } from './config.js';
 import { formatCrashTime } from './crash-content.js';
-import { hideIdleCursor, mountCrash } from './crash-view.js';
+import { blockCopy, fullscreenOnClick, hideIdleCursor, mountCrash } from './crash-view.js';
 import { buildMessage, fullscreenHref, readParams } from './message.js';
 import { crashTheme, lockHint, resolveOS } from './os.js';
 
@@ -26,16 +26,14 @@ async function init() {
     time: formatCrashTime(),
   });
   hideIdleCursor(document.body);
+  blockCopy(document);
 
   // Ici, pas de geste utilisateur au chargement : le vrai plein écran attend un clic (règle des navigateurs).
+  fullscreenOnClick(root);
   const fsButton = document.getElementById('crash-fs');
   if (document.fullscreenEnabled) {
     fsButton.hidden = false;
-    const goFullscreen = () => document.documentElement.requestFullscreen().catch(() => {});
-    fsButton.addEventListener('click', goFullscreen);
-    root.addEventListener('click', () => {
-      if (!document.fullscreenElement) goFullscreen();
-    });
+    fsButton.addEventListener('click', () => document.documentElement.requestFullscreen().catch(() => {}));
   }
 }
 

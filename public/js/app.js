@@ -1,6 +1,6 @@
 import { loadConfig } from './config.js';
 import { formatCrashTime } from './crash-content.js';
-import { hideIdleCursor, mountCrash } from './crash-view.js';
+import { blockCopy, fullscreenOnClick, hideIdleCursor, mountCrash } from './crash-view.js';
 import { buildMessage, parseNames, pickTemplateIndex, readParams, sanitizeName } from './message.js';
 import { crashTheme, lockHint, resolveOS } from './os.js';
 
@@ -165,9 +165,15 @@ async function init() {
       time: formatCrashTime(),
     });
     const showCursor = hideIdleCursor(overlay);
+    // Sortie du plein écran (Échap) : un clic sur l'écran de crash y revient.
+    const stopFullscreenOnClick = fullscreenOnClick($('crash-root'));
+    const allowCopy = blockCopy(document);
+    window.getSelection()?.removeAllRanges();
     cleanup = () => {
       unmount();
       showCursor();
+      stopFullscreenOnClick();
+      allowCopy();
     };
     overlay.hidden = false;
     document.body.classList.add('is-crashing');

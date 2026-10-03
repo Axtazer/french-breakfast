@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import QRCode from 'qrcode';
 import { CRASH_QR_URL, formatCrashTime, linuxCrash, macCrash, windowsCrash } from '../public/js/crash-content.js';
+import { QR_TEXT } from '../public/js/qr-boulangerie-text.js';
 
 const ctx = {
   by: 'Alex',
@@ -34,7 +36,8 @@ test('écran Linux : log de kernel panic avec le message', () => {
   assert.ok(lines.some((l) => l.includes('current user left the session unlocked (croissanted at 08h47)')));
   assert.ok(lines.some((l) => l.includes('croissanted by "Alex"')));
   assert.ok(lines.some((l) => l.includes(`Kernel panic - not syncing: ${ctx.message}`)));
-  assert.match(lines.at(-1), /end Kernel panic - not syncing: CROISSANTS_NOT_DELIVERED/);
+  assert.match(lines.at(-2), /end Kernel panic - not syncing: CROISSANTS_NOT_DELIVERED/);
+  assert.match(lines.at(-1), /drm_panic: scan the QR code/);
   assert.ok(!linuxCrash({ ...ctx, by: '' }).some((l) => l.includes('croissanted by')));
 });
 
@@ -45,4 +48,22 @@ test('formatCrashTime : heure française sur deux chiffres', () => {
 
 test('le QR code pointe vers les boulangeries sur Google Maps', () => {
   assert.equal(CRASH_QR_URL, 'https://www.google.com/maps/search/?api=1&query=boulangerie');
+});
+
+test('le QR code texte (écran Linux) encode exactement l’URL des boulangeries', () => {
+  // Reconstitue la matrice depuis les demi-blocs : bloc = module clair, vide = module sombre.
+  const TOP = { '█': true, '▀': true, '▄': false, ' ': false };
+  const BOTTOM = { '█': true, '▀': false, '▄': true, ' ': false };
+  const rows = [];
+  for (const line of QR_TEXT.split('\n')) {
+    const chars = Array.from(line);
+    rows.push(chars.map((c) => !TOP[c]), chars.map((c) => !BOTTOM[c]));
+  }
+  const { size, data } = QRCode.create(CRASH_QR_URL, { errorCorrectionLevel: 'M' }).modules;
+  const quiet = 2;
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      assert.equal(rows[r + quiet][c + quiet], Boolean(data[r * size + c]), `module ${r},${c}`);
+    }
+  }
 });
