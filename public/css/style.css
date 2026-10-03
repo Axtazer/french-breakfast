@@ -108,6 +108,13 @@ body {
   gap: 8px;
 }
 
+.form-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
 label {
   font-weight: 600;
 }
@@ -143,16 +150,6 @@ input[type='text']:focus-visible,
 
 input::placeholder {
   color: #7d7468;
-}
-
-input[aria-invalid='true'] {
-  border-color: var(--error);
-}
-
-.field-error {
-  margin: 0;
-  color: var(--error);
-  font-size: 0.95rem;
 }
 
 .chips {
@@ -330,7 +327,7 @@ input[aria-invalid='true'] {
   line-height: 1.05;
 }
 
-.stage-victim {
+.stage-subject {
   display: -webkit-box;
   max-width: 94vw;
   overflow: hidden;

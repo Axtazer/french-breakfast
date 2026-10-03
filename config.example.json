@@ -2,8 +2,9 @@
   "appName": "Croissanté",
   "tagline": "Un PC déverrouillé, des croissants pour toute l’équipe.",
   "enableByField": true,
-  "messageTemplate": "🥐 {victim} a été croissanté par {by}. Poste laissé déverrouillé : les croissants sont attendus !",
-  "messageTemplateAnonymous": "🥐 {victim} a été croissanté. Poste laissé déverrouillé : les croissants sont attendus !",
+  "messageTemplate": "🥐 J’ai laissé mon PC déverrouillé et {by} m’a croissanté : je ramène les croissants à toute l’équipe !",
+  "messageTemplateAnonymous": "🥐 J’ai laissé mon PC déverrouillé : je ramène les croissants à toute l’équipe !",
+  "fullscreenSubject": "Ce PC",
   "fullscreenTitle": "A ÉTÉ CROISSANTÉ",
   "fullscreenByline": "par {by}",
   "fullscreenSubtitle": "Pense à {shortcut} la prochaine fois.",
@@ -17,8 +18,8 @@
   "enableCrashScreen": true,
   "crashStopCode": "CROISSANTS_NOT_DELIVERED",
   "presetNames": [
-    "Lucas",
-    "Flo"
+    "Flo",
+    "Sam"
   ],
   "rememberRecentNames": false,
   "maxNameLength": 40

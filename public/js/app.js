@@ -29,9 +29,11 @@ function rememberName(config, name) {
 
 function renderChips(config) {
   const container = $('presets');
-  const names = [...new Set([...readRecent(config), ...config.presetNames])]
-    .map((n) => sanitizeName(n, config.maxNameLength))
-    .filter(Boolean);
+  const names = config.enableByField
+    ? [...new Set([...readRecent(config), ...config.presetNames])]
+        .map((n) => sanitizeName(n, config.maxNameLength))
+        .filter(Boolean)
+    : [];
   container.replaceChildren();
   for (const name of names) {
     const chip = document.createElement('button');
@@ -39,9 +41,8 @@ function renderChips(config) {
     chip.className = 'chip';
     chip.textContent = name;
     chip.addEventListener('click', () => {
-      $('victim').value = name;
-      $('victim-error').hidden = true;
-      (config.enableByField ? $('by') : document.querySelector('.btn-primary')).focus();
+      $('by').value = name;
+      document.querySelector('.btn-primary').focus();
     });
     container.append(chip);
   }
@@ -74,7 +75,7 @@ function applyBranding(config) {
   document.title = `${config.appName} 🥐`;
   $('by-field').hidden = !config.enableByField;
   $('crash-link').hidden = !config.enableCrashScreen;
-  for (const input of [$('victim'), $('by')]) input.maxLength = config.maxNameLength;
+  $('by').maxLength = config.maxNameLength;
 }
 
 async function init() {
@@ -83,47 +84,29 @@ async function init() {
   renderChips(config);
 
   const form = $('croissant-form');
-  const victimInput = $('victim');
   const byInput = $('by');
   const result = $('result');
   const message = $('message');
   const feedback = $('copy-feedback');
 
-  const params = readParams(window.location.search, config.maxNameLength);
-  victimInput.value = params.victim;
-  if (config.enableByField) byInput.value = params.by;
-  (params.victim ? form.querySelector('.btn-primary') : victimInput).focus();
+  if (config.enableByField) byInput.value = readParams(window.location.search, config.maxNameLength).by;
+  form.querySelector('.btn-primary').focus();
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const victim = sanitizeName(victimInput.value, config.maxNameLength);
     const by = config.enableByField ? sanitizeName(byInput.value, config.maxNameLength) : '';
-    victimInput.value = victim;
     byInput.value = by;
 
-    if (!victim) {
-      $('victim-error').hidden = false;
-      victimInput.setAttribute('aria-invalid', 'true');
-      victimInput.focus();
-      return;
-    }
-    $('victim-error').hidden = true;
-    victimInput.removeAttribute('aria-invalid');
-
-    message.value = buildMessage(config, victim, by);
-    $('fullscreen-link').href = fullscreenHref(victim, by);
-    $('crash-link').href = crashHref(victim, by);
+    message.value = buildMessage(config, by);
+    $('fullscreen-link').href = fullscreenHref(by);
+    $('crash-link').href = crashHref(by);
     feedback.textContent = '';
     feedback.className = 'feedback';
     result.hidden = false;
     $('copy-btn').focus();
 
-    rememberName(config, victim);
+    if (by) rememberName(config, by);
     renderChips(config);
-  });
-
-  victimInput.addEventListener('input', () => {
-    if (victimInput.value.trim()) $('victim-error').hidden = true;
   });
 
   $('copy-btn').addEventListener('click', async () => {

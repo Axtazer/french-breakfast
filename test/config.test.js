@@ -19,7 +19,7 @@ test('les variables d’environnement surchargent la config', () => {
       PRESET_NAMES: ' Lucas, Flo ,,Sam ',
       REMEMBER_RECENT_NAMES: 'true',
       MAX_NAME_LENGTH: '20',
-      MESSAGE_TEMPLATE: '{victim} <- {by}',
+      MESSAGE_TEMPLATE: 'Croissanté par {by} !',
     },
     quiet,
   );
@@ -28,7 +28,7 @@ test('les variables d’environnement surchargent la config', () => {
   assert.deepEqual(config.presetNames, ['Lucas', 'Flo', 'Sam']);
   assert.equal(config.rememberRecentNames, true);
   assert.equal(config.maxNameLength, 20);
-  assert.equal(config.messageTemplate, '{victim} <- {by}');
+  assert.equal(config.messageTemplate, 'Croissanté par {by} !');
 });
 
 test('les valeurs invalides sont ignorées', () => {

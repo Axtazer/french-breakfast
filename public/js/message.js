@@ -15,39 +15,37 @@ export function sanitizeName(value, maxLength = DEFAULT_MAX_NAME_LENGTH) {
   return Array.from(cleaned).slice(0, maxLength).join('').trim();
 }
 
-/** Remplace {victim} et {by} dans un template (pas d'autre interprétation). */
+/** Remplace {by} dans un template (pas d'autre interprétation). */
 export function renderTemplate(template, values) {
-  return String(template).replace(/\{(victim|by)\}/g, (_, key) => values[key] ?? '');
+  return String(template).replace(/\{by\}/g, () => values.by ?? '');
 }
 
-/** Construit le message à copier/coller. */
-export function buildMessage(config, victim, by) {
+/**
+ * Construit le message à copier/coller. Il est envoyé depuis le compte de la victime,
+ * d'où l'absence de son nom : seul le croissanteur (facultatif) est mentionné.
+ */
+export function buildMessage(config, by) {
   const useBy = Boolean(config.enableByField && by);
   const template = useBy ? config.messageTemplate : config.messageTemplateAnonymous;
-  return renderTemplate(template, { victim, by: useBy ? by : '' });
+  return renderTemplate(template, { by: useBy ? by : '' });
 }
 
-/** Lit victim / by depuis une query string, sans leur faire confiance. */
+/** Lit le paramètre by depuis une query string, sans lui faire confiance. */
 export function readParams(search, maxLength = DEFAULT_MAX_NAME_LENGTH) {
   const params = new URLSearchParams(search);
-  return {
-    victim: sanitizeName(params.get('victim') ?? '', maxLength),
-    by: sanitizeName(params.get('by') ?? '', maxLength),
-  };
+  return { by: sanitizeName(params.get('by') ?? '', maxLength) };
 }
 
-function pageHref(page, victim, by) {
-  const params = new URLSearchParams({ victim });
-  if (by) params.set('by', by);
-  return `${page}?${params}`;
+function pageHref(page, by) {
+  return by ? `${page}?${new URLSearchParams({ by })}` : page;
 }
 
 /** URL relative de la vue plein écran (fonctionne derrière n'importe quel préfixe/hostname). */
-export function fullscreenHref(victim, by) {
-  return pageHref('croissante', victim, by);
+export function fullscreenHref(by) {
+  return pageHref('croissante', by);
 }
 
 /** URL relative de l'écran de crash. */
-export function crashHref(victim, by) {
-  return pageHref('crash', victim, by);
+export function crashHref(by) {
+  return pageHref('crash', by);
 }

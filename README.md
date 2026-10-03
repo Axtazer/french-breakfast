@@ -5,11 +5,13 @@ Petite application web pour **« croissanter »** un collègue qui a laissé son
 La tradition : quand quelqu'un quitte son poste sans le verrouiller, un collègue envoie un message depuis ce poste
 pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l'opération rapide, propre et amusante :
 
-1. saisir le nom de la victime (et, facultativement, du croissanteur) ;
-2. cliquer sur **🥐 CROISSANTER** ;
-3. **copier** le message généré et le coller dans Teams, Slack, un mail… ;
+1. depuis le poste déverrouillé, ouvrir l'app et cliquer sur **🥐 CROISSANTER**
+   (le nom du croissanteur est facultatif) ;
+2. **copier** le message généré et le coller dans Teams, Slack, un mail… ;
+3. et voilà : il part **avec le compte de la victime**, à la première personne
+   (« J'ai laissé mon PC déverrouillé : je ramène les croissants à toute l'équipe ! ») ;
 4. afficher la page **CROISSANTÉ** en plein écran sur le poste concerné,
-   ou un **faux écran de crash** adapté à l'OS de la victime (écran de crash Windows version orange, kernel panic macOS ou Linux).
+   ou un **faux écran de crash** adapté à l'OS du poste (écran de crash Windows version orange, kernel panic macOS ou Linux).
 
 > L'application **n'envoie rien** : elle génère uniquement un message prêt à copier/coller.
 > Aucun compte, aucun secret, aucune intégration Teams/mail.
@@ -76,15 +78,17 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 | URL | Effet |
 | --- | --- |
 | `/` | Formulaire |
-| `/?victim=Lucas` | Formulaire pré-rempli (il ne reste qu'à appuyer sur Entrée) |
-| `/?victim=Lucas&by=Flo` | Idem avec le croissanteur |
-| `/croissante?victim=Lucas&by=Flo` | Directement la vue « CROISSANTÉ » |
-| `/crash?victim=Lucas&by=Flo` | Faux écran de crash adapté à l'OS détecté |
-| `/crash?victim=Lucas&os=mac` | Idem en forçant l'OS (`windows`, `mac`, `linux`, `chromeos`, `ios`, `android`) |
+| `/?by=Flo` | Formulaire avec le croissanteur pré-rempli (il ne reste qu'à appuyer sur Entrée) |
+| `/croissante?by=Flo` | Directement la vue « CE PC A ÉTÉ CROISSANTÉ » |
+| `/crash?by=Flo` | Faux écran de crash adapté à l'OS détecté |
+| `/crash?os=mac` | Idem en forçant l'OS (`windows`, `mac`, `linux`, `chromeos`, `ios`, `android`) |
 | `/health` | `{"status":"ok"}` (HTTP 200) |
 | `/config.json` | Configuration publique utilisée par le frontend |
 
-Astuce : mettre `/?victim=` en favori pour croissanter encore plus vite.
+Le nom de la victime n'est jamais demandé : le message est envoyé depuis son poste, donc avec son propre compte.
+Le bouton **🥐 CROISSANTER** a le focus à l'ouverture : il suffit d'appuyer sur Entrée.
+
+Astuce : mettre `/?by=VotrePrénom` en favori pour croissanter encore plus vite.
 
 Les paramètres d'URL sont nettoyés (caractères de contrôle, longueur max) et toujours insérés via `textContent` :
 ils ne sont jamais interprétés comme du HTML.
@@ -102,7 +106,7 @@ rien n'est envoyé ni enregistré. Il sert à :
 La détection est approximative par nature (un iPad se présente comme un Mac, le user-agent peut être modifié) :
 `?os=` permet de forcer le résultat. Sur Linux, le raccourci dépend de l'environnement de bureau (configurable).
 
-L'écran de crash affiche le message du croissantage (victime, croissanteur, code d'arrêt, raccourci).
+L'écran de crash affiche le message du croissantage (croissanteur, code d'arrêt, raccourci).
 Un clic n'importe où passe en vrai plein écran (geste utilisateur, aucun contournement), le curseur se masque
 après quelques secondes, et les liens « Accueil » / « Vue croissant » restent accessibles au survol ou au clavier (Tab).
 
@@ -188,8 +192,9 @@ Une valeur invalide est ignorée (avec un avertissement dans les logs).
 | `APP_NAME` | `appName` | `Croissanté` | Nom affiché |
 | `APP_TAGLINE` | `tagline` | `Un PC déverrouillé, …` | Sous-titre |
 | `ENABLE_BY_FIELD` | `enableByField` | `true` | Affiche le champ « Qui croissante ? » |
-| `MESSAGE_TEMPLATE` | `messageTemplate` | `🥐 {victim} a été croissanté par {by}. …` | Message avec croissanteur |
-| `MESSAGE_TEMPLATE_ANONYMOUS` | `messageTemplateAnonymous` | `🥐 {victim} a été croissanté. …` | Message sans croissanteur |
+| `MESSAGE_TEMPLATE` | `messageTemplate` | `🥐 J’ai laissé mon PC déverrouillé et {by} m’a croissanté : …` | Message avec croissanteur |
+| `MESSAGE_TEMPLATE_ANONYMOUS` | `messageTemplateAnonymous` | `🥐 J’ai laissé mon PC déverrouillé : …` | Message sans croissanteur |
+| `FULLSCREEN_SUBJECT` | `fullscreenSubject` | `Ce PC` | Gros texte de la vue plein écran |
 | `FULLSCREEN_TITLE` | `fullscreenTitle` | `A ÉTÉ CROISSANTÉ` | Texte principal de la vue plein écran |
 | `FULLSCREEN_BYLINE` | `fullscreenByline` | `par {by}` | Ligne « par … » (vide = masquée) |
 | `FULLSCREEN_SUBTITLE` | `fullscreenSubtitle` | `Pense à {shortcut} la prochaine fois.` | Texte secondaire (`{shortcut}` = raccourci de l'OS) |
@@ -197,22 +202,23 @@ Une valeur invalide est ignorée (avec un avertissement dans les logs).
 | `LOCK_SHORTCUTS` | `lockShortcuts` | `{"windows":"Win + L","mac":"Ctrl + Cmd + Q","linux":"Super + L","chromeos":"Recherche + L"}` | Raccourcis par OS (objet JSON, fusionné avec les défauts) |
 | `ENABLE_CRASH_SCREEN` | `enableCrashScreen` | `true` | Active l'écran de crash (sinon `/crash` renvoie vers la vue croissant) |
 | `CRASH_STOP_CODE` | `crashStopCode` | `CROISSANTS_NOT_DELIVERED` | Code d'arrêt affiché sur l'écran de crash |
-| `PRESET_NAMES` | `presetNames` | *(vide)* | Noms proposés en raccourci (`Lucas,Flo` / tableau JSON) |
+| `PRESET_NAMES` | `presetNames` | *(vide)* | Croissanteurs proposés en raccourci (`Flo,Sam` / tableau JSON) |
 | `REMEMBER_RECENT_NAMES` | `rememberRecentNames` | `false` | Mémorise les derniers noms **dans le navigateur** (localStorage) |
 | `MAX_NAME_LENGTH` | `maxNameLength` | `40` | Longueur max d'un nom |
 | `CONFIG_FILE` | — | — | Chemin d'un fichier JSON (voir `config.example.json`) |
 | `PORT` | — | `8080` | Port d'écoute |
 | `HOST` | — | `0.0.0.0` | Adresse d'écoute |
 
-Les templates acceptent les placeholders `{victim}` et `{by}` (et `{shortcut}` pour `fullscreenSubtitle`).
+Les templates de message acceptent le placeholder `{by}` (et `fullscreenSubtitle` accepte `{shortcut}`).
+Le message étant envoyé depuis le compte de la victime, il est écrit à la première personne.
 Ils sont traités comme du texte brut.
 
 Exemple :
 
 ```bash
 docker run --rm -p 8080:8080 \
-  -e PRESET_NAMES="Lucas,Flo,Sam" \
-  -e MESSAGE_TEMPLATE="🥐 Alerte ! {victim} offre les croissants (merci {by})." \
+  -e PRESET_NAMES="Flo,Sam" \
+  -e MESSAGE_TEMPLATE="🥐 Alerte : demain c'est moi qui offre les croissants (merci {by})." \
   ghcr.io/OWNER/REPO:latest
 ```
 

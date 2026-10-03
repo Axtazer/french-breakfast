@@ -1,11 +1,12 @@
 // Textes des écrans de crash (logique pure, testée sous Node). Toujours insérés via textContent.
 
 /**
- * @param {{ victim: string, by: string, message: string, hint: string, stopCode: string }} ctx
+ * L'écran s'affiche sur le poste de la victime : il s'adresse directement à elle, sans la nommer.
+ * @param {{ by: string, message: string, hint: string, stopCode: string }} ctx
  */
 export function windowsCrash(ctx) {
   return {
-    victimLine: `${ctx.victim} doit maintenant ramener des croissants à toute l’équipe. Nous collectons simplement quelques informations sur la viennoiserie, puis nous redémarrerons.`,
+    lead: 'Vous devez maintenant ramener des croissants à toute l’équipe. Nous collectons simplement quelques informations sur la viennoiserie, puis nous redémarrerons.',
     message: ctx.message,
     stopCode: ctx.stopCode,
     by: ctx.by ? `Croissanté par : ${ctx.by}` : '',
@@ -16,21 +17,20 @@ export function windowsCrash(ctx) {
 
 export function macCrash(ctx) {
   return {
-    fr: `Vous devez apporter des croissants. ${ctx.victim} a laissé son poste déverrouillé.`,
-    en: `You need to bring croissants. ${ctx.victim} left this computer unlocked.`,
-    de: `Sie müssen Croissants mitbringen. ${ctx.victim} hat den Rechner nicht gesperrt.`,
-    ja: `クロワッサンを持ってくる必要があります。${ctx.victim} はロックせずに席を離れました。`,
+    fr: 'Vous devez apporter des croissants. Ce poste a été laissé déverrouillé.',
+    en: 'You need to bring croissants. This computer was left unlocked.',
+    de: 'Sie müssen Croissants mitbringen. Dieser Rechner wurde nicht gesperrt.',
+    ja: 'クロワッサンを持ってくる必要があります。このコンピュータはロックされていませんでした。',
     message: ctx.message,
     hint: ctx.hint,
   };
 }
 
 export function linuxCrash(ctx) {
-  const user = JSON.stringify(ctx.victim);
   const lines = [
     '[    0.000000] Linux version 6.6.6-croissant (boulanger@fournil) (gcc 14.2.0) #1 SMP PREEMPT_DYNAMIC',
     '[    0.004217] Command line: BOOT_IMAGE=/vmlinuz-croissant root=/dev/fournil ro quiet splash',
-    `[ 4242.000001] session: user ${user} left the session unlocked`,
+    '[ 4242.000001] session: current user left the session unlocked',
     '[ 4242.000023] croissant: checking croissant supply... 0 found',
   ];
   if (ctx.by) lines.push(`[ 4242.000031] croissant: session croissanted by ${JSON.stringify(ctx.by)}`);

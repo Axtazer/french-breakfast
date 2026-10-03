@@ -6,18 +6,18 @@ const $ = (id) => document.getElementById(id);
 
 async function init() {
   const config = await loadConfig();
-  const { victim, by } = readParams(window.location.search, config.maxNameLength);
+  const { by } = readParams(window.location.search, config.maxNameLength);
   const shownBy = config.enableByField ? by : '';
 
   // Toujours textContent : les paramètres d'URL ne sont jamais interprétés comme du HTML.
-  $('stage-victim').textContent = victim || 'Quelqu’un';
+  $('stage-subject').textContent = config.fullscreenSubject;
   $('stage-title').textContent = config.fullscreenTitle;
   $('stage-subtitle').textContent = lockHint(config, resolveOS(window.location.search, navigator));
   if (shownBy && config.fullscreenByline) {
-    $('stage-by').textContent = renderTemplate(config.fullscreenByline, { victim, by: shownBy });
+    $('stage-by').textContent = renderTemplate(config.fullscreenByline, { by: shownBy });
     $('stage-by').hidden = false;
   }
-  document.title = `${victim || 'Quelqu’un'} ${config.fullscreenTitle.toLowerCase()} 🥐`;
+  document.title = `${config.fullscreenSubject} ${config.fullscreenTitle.toLowerCase()} 🥐`;
 
   // Vrai plein écran uniquement sur action explicite de l'utilisateur.
   const fsButton = $('fs-btn');

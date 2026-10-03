@@ -24,7 +24,7 @@ test('GET /health renvoie {"status":"ok"}', async () => {
 });
 
 test('GET / sert la page d’accueil avec les headers de sécurité', async () => {
-  const res = await fetch(`${base}/?victim=Zorglub42&by=Flo`);
+  const res = await fetch(`${base}/?by=Zorglub42`);
   assert.equal(res.status, 200);
   assert.match(res.headers.get('content-type'), /text\/html/);
   assert.match(res.headers.get('content-security-policy'), /default-src 'none'/);
@@ -39,15 +39,15 @@ test('GET / sert la page d’accueil avec les headers de sécurité', async () =
 });
 
 test('GET /croissante sert la vue plein écran', async () => {
-  const res = await fetch(`${base}/croissante?victim=%3Cscript%3E`);
+  const res = await fetch(`${base}/croissante?by=%3Cscript%3E`);
   assert.equal(res.status, 200);
   const html = await res.text();
-  assert.match(html, /stage-victim/);
+  assert.match(html, /stage-subject/);
   assert.doesNotMatch(html, /<script>/);
 });
 
 test('GET /crash sert l’écran de crash', async () => {
-  const res = await fetch(`${base}/crash?victim=Lucas&os=mac`);
+  const res = await fetch(`${base}/crash?by=Flo&os=mac`);
   assert.equal(res.status, 200);
   assert.match(await res.text(), /crash-windows/);
 });

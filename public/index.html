@@ -23,17 +23,14 @@
       </noscript>
 
       <form id="croissant-form" class="form" autocomplete="off" novalidate>
-        <div class="field">
-          <label for="victim">Qui a laissé son PC déverrouillé ?</label>
-          <input id="victim" name="victim" type="text" required maxlength="40"
-                 placeholder="Lucas" spellcheck="false" aria-describedby="victim-error" />
-          <p id="victim-error" class="field-error" role="alert" hidden>Indique un nom 🙂</p>
-          <div id="presets" class="chips" aria-label="Noms rapides" hidden></div>
-        </div>
+        <p class="form-hint">
+          Le message sera envoyé depuis ce poste, donc avec le compte de la victime : pas besoin de son nom.
+        </p>
 
         <div class="field" id="by-field">
           <label for="by">Qui croissante ? <span class="optional">(facultatif)</span></label>
           <input id="by" name="by" type="text" maxlength="40" placeholder="Flo" spellcheck="false" />
+          <div id="presets" class="chips" aria-label="Noms rapides" hidden></div>
         </div>
 
         <button type="submit" class="btn btn-primary">🥐 CROISSANTER</button>

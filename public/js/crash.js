@@ -8,7 +8,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 function renderWindows(ctx) {
   const text = windowsCrash(ctx);
-  $('bsod-victim-line').textContent = text.victimLine;
+  $('bsod-lead-line').textContent = text.lead;
   $('bsod-message').textContent = text.message;
   $('bsod-stopcode').textContent = text.stopCode;
   $('bsod-hint').textContent = text.hint;
@@ -18,7 +18,7 @@ function renderWindows(ctx) {
   }
 
   const qr = $('bsod-qr');
-  for (const row of fakeQrMatrix(`${ctx.victim}|${ctx.by}`)) {
+  for (const row of fakeQrMatrix(`croissant|${ctx.by}`)) {
     for (const on of row) {
       const cell = document.createElement('span');
       if (on) cell.className = 'on';
@@ -94,26 +94,24 @@ function setupInteractions() {
 
 async function init() {
   const config = await loadConfig();
-  const { victim: rawVictim, by: rawBy } = readParams(window.location.search, config.maxNameLength);
+  const { by: rawBy } = readParams(window.location.search, config.maxNameLength);
   const by = config.enableByField ? rawBy : '';
 
   if (!config.enableCrashScreen) {
-    window.location.replace(fullscreenHref(rawVictim, by));
+    window.location.replace(fullscreenHref(by));
     return;
   }
 
-  const victim = rawVictim || 'Quelqu’un';
   const os = resolveOS(window.location.search, navigator);
   const theme = crashTheme(os);
   const ctx = {
-    victim,
     by,
-    message: buildMessage(config, victim, by),
+    message: buildMessage(config, by),
     hint: lockHint(config, os),
     stopCode: config.crashStopCode,
   };
 
-  $('crash-to-stage').href = fullscreenHref(rawVictim, by);
+  $('crash-to-stage').href = fullscreenHref(by);
   document.body.dataset.theme = theme;
   $(`crash-${theme}`).hidden = false;
   ({ windows: renderWindows, mac: renderMac, linux: renderLinux })[theme](ctx);
