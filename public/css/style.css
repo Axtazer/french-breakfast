@@ -253,6 +253,10 @@ input[aria-invalid='true'] {
   margin-top: 12px;
 }
 
+.actions > :first-child {
+  grid-column: 1 / -1;
+}
+
 .feedback {
   min-height: 1.5em;
   margin: 12px 0 0;

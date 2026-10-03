@@ -6,8 +6,20 @@
   "messageTemplateAnonymous": "🥐 {victim} a été croissanté. Poste laissé déverrouillé : les croissants sont attendus !",
   "fullscreenTitle": "A ÉTÉ CROISSANTÉ",
   "fullscreenByline": "par {by}",
-  "fullscreenSubtitle": "Pense à Win + L la prochaine fois.",
-  "presetNames": ["Lucas", "Flo"],
+  "fullscreenSubtitle": "Pense à {shortcut} la prochaine fois.",
+  "fullscreenSubtitleFallback": "Pense à verrouiller ton poste la prochaine fois.",
+  "lockShortcuts": {
+    "windows": "Win + L",
+    "mac": "Ctrl + Cmd + Q",
+    "linux": "Super + L",
+    "chromeos": "Recherche + L"
+  },
+  "enableCrashScreen": true,
+  "crashStopCode": "CROISSANTS_NOT_DELIVERED",
+  "presetNames": [
+    "Lucas",
+    "Flo"
+  ],
   "rememberRecentNames": false,
   "maxNameLength": 40
 }

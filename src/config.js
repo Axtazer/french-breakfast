@@ -11,7 +11,11 @@ const STRING_KEYS = [
   'fullscreenTitle',
   'fullscreenByline',
   'fullscreenSubtitle',
+  'fullscreenSubtitleFallback',
+  'crashStopCode',
 ];
+
+const SHORTCUT_OS = ['windows', 'mac', 'linux', 'chromeos'];
 
 /** Variables d'environnement -> clé de configuration. */
 const ENV_MAP = {
@@ -23,6 +27,10 @@ const ENV_MAP = {
   FULLSCREEN_TITLE: 'fullscreenTitle',
   FULLSCREEN_BYLINE: 'fullscreenByline',
   FULLSCREEN_SUBTITLE: 'fullscreenSubtitle',
+  FULLSCREEN_SUBTITLE_FALLBACK: 'fullscreenSubtitleFallback',
+  LOCK_SHORTCUTS: 'lockShortcuts',
+  ENABLE_CRASH_SCREEN: 'enableCrashScreen',
+  CRASH_STOP_CODE: 'crashStopCode',
   PRESET_NAMES: 'presetNames',
   REMEMBER_RECENT_NAMES: 'rememberRecentNames',
   MAX_NAME_LENGTH: 'maxNameLength',
@@ -34,6 +42,24 @@ function parseBoolean(value) {
   if (['1', 'true', 'yes', 'on'].includes(v)) return true;
   if (['0', 'false', 'no', 'off', ''].includes(v)) return false;
   return undefined;
+}
+
+/** Objet { os: raccourci } (objet JSON, ou chaîne JSON depuis l'environnement). Fusionné avec les défauts. */
+function parseShortcuts(value) {
+  let obj = value;
+  if (typeof value === 'string') {
+    try {
+      obj = JSON.parse(value);
+    } catch {
+      return undefined;
+    }
+  }
+  if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) return undefined;
+  const result = { ...DEFAULT_CONFIG.lockShortcuts };
+  for (const os of SHORTCUT_OS) {
+    if (typeof obj[os] === 'string') result[os] = obj[os].slice(0, 50);
+  }
+  return result;
 }
 
 function parseList(value) {
@@ -53,9 +79,12 @@ function normalize(key, value) {
   switch (key) {
     case 'enableByField':
     case 'rememberRecentNames':
+    case 'enableCrashScreen':
       return parseBoolean(value);
     case 'presetNames':
       return parseList(value);
+    case 'lockShortcuts':
+      return parseShortcuts(value);
     case 'maxNameLength': {
       const n = Number.parseInt(value, 10);
       return Number.isInteger(n) && n >= 1 && n <= 200 ? n : undefined;

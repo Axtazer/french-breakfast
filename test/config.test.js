@@ -48,3 +48,18 @@ test('CONFIG_FILE est chargé, puis surchargé par l’environnement', () => {
   assert.deepEqual(config.presetNames, ['Ana']);
   assert.equal('inconnu' in config, false);
 });
+
+test('LOCK_SHORTCUTS (JSON) surcharge les raccourcis en gardant les autres', () => {
+  const config = loadConfig({ LOCK_SHORTCUTS: '{"mac":"Cmd + Ctrl + Q","linux":42,"amiga":"x"}' }, quiet);
+  assert.equal(config.lockShortcuts.mac, 'Cmd + Ctrl + Q');
+  assert.equal(config.lockShortcuts.windows, 'Win + L');
+  assert.equal(config.lockShortcuts.linux, 'Super + L');
+  assert.equal('amiga' in config.lockShortcuts, false);
+  assert.deepEqual(loadConfig({ LOCK_SHORTCUTS: 'pas du json' }, quiet).lockShortcuts, DEFAULT_CONFIG.lockShortcuts);
+});
+
+test('ENABLE_CRASH_SCREEN et CRASH_STOP_CODE', () => {
+  const config = loadConfig({ ENABLE_CRASH_SCREEN: 'false', CRASH_STOP_CODE: 'PAIN_AU_CHOCOLAT' }, quiet);
+  assert.equal(config.enableCrashScreen, false);
+  assert.equal(config.crashStopCode, 'PAIN_AU_CHOCOLAT');
+});

@@ -1,5 +1,5 @@
 import { loadConfig } from './config.js';
-import { buildMessage, fullscreenHref, readParams, sanitizeName } from './message.js';
+import { buildMessage, crashHref, fullscreenHref, readParams, sanitizeName } from './message.js';
 
 const RECENT_KEY = 'croissante.recentNames';
 const MAX_RECENT = 6;
@@ -73,6 +73,7 @@ function applyBranding(config) {
   $('tagline').textContent = config.tagline;
   document.title = `${config.appName} 🥐`;
   $('by-field').hidden = !config.enableByField;
+  $('crash-link').hidden = !config.enableCrashScreen;
   for (const input of [$('victim'), $('by')]) input.maxLength = config.maxNameLength;
 }
 
@@ -111,6 +112,7 @@ async function init() {
 
     message.value = buildMessage(config, victim, by);
     $('fullscreen-link').href = fullscreenHref(victim, by);
+    $('crash-link').href = crashHref(victim, by);
     feedback.textContent = '';
     feedback.className = 'feedback';
     result.hidden = false;

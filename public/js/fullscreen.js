@@ -1,5 +1,6 @@
 import { loadConfig } from './config.js';
 import { readParams, renderTemplate } from './message.js';
+import { lockHint, resolveOS } from './os.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -11,7 +12,7 @@ async function init() {
   // Toujours textContent : les paramètres d'URL ne sont jamais interprétés comme du HTML.
   $('stage-victim').textContent = victim || 'Quelqu’un';
   $('stage-title').textContent = config.fullscreenTitle;
-  $('stage-subtitle').textContent = config.fullscreenSubtitle;
+  $('stage-subtitle').textContent = lockHint(config, resolveOS(window.location.search, navigator));
   if (shownBy && config.fullscreenByline) {
     $('stage-by').textContent = renderTemplate(config.fullscreenByline, { victim, by: shownBy });
     $('stage-by').hidden = false;

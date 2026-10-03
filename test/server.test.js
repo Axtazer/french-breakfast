@@ -46,6 +46,12 @@ test('GET /croissante sert la vue plein écran', async () => {
   assert.doesNotMatch(html, /<script>/);
 });
 
+test('GET /crash sert l’écran de crash', async () => {
+  const res = await fetch(`${base}/crash?victim=Lucas&os=mac`);
+  assert.equal(res.status, 200);
+  assert.match(await res.text(), /crash-windows/);
+});
+
 test('GET /config.json expose la configuration publique', async () => {
   const res = await fetch(`${base}/config.json`);
   assert.equal(res.status, 200);

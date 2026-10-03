@@ -21,6 +21,7 @@ const MIME_TYPES = {
 const PAGE_ROUTES = {
   '/': 'index.html',
   '/croissante': 'croissante.html',
+  '/crash': 'crash.html',
 };
 
 export const SECURITY_HEADERS = Object.freeze({

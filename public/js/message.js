@@ -36,9 +36,18 @@ export function readParams(search, maxLength = DEFAULT_MAX_NAME_LENGTH) {
   };
 }
 
-/** URL relative de la vue plein écran (fonctionne derrière n'importe quel préfixe/hostname). */
-export function fullscreenHref(victim, by) {
+function pageHref(page, victim, by) {
   const params = new URLSearchParams({ victim });
   if (by) params.set('by', by);
-  return `croissante?${params}`;
+  return `${page}?${params}`;
+}
+
+/** URL relative de la vue plein écran (fonctionne derrière n'importe quel préfixe/hostname). */
+export function fullscreenHref(victim, by) {
+  return pageHref('croissante', victim, by);
+}
+
+/** URL relative de l'écran de crash. */
+export function crashHref(victim, by) {
+  return pageHref('crash', victim, by);
 }

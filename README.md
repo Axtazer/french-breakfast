@@ -8,7 +8,8 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
 1. saisir le nom de la victime (et, facultativement, du croissanteur) ;
 2. cliquer sur **🥐 CROISSANTER** ;
 3. **copier** le message généré et le coller dans Teams, Slack, un mail… ;
-4. afficher la page **CROISSANTÉ** en plein écran sur le poste concerné.
+4. afficher la page **CROISSANTÉ** en plein écran sur le poste concerné,
+   ou un **faux écran de crash** adapté à l'OS de la victime (écran bleu Windows, kernel panic macOS ou Linux).
 
 > L'application **n'envoie rien** : elle génère uniquement un message prêt à copier/coller.
 > Aucun compte, aucun secret, aucune intégration Teams/mail.
@@ -18,6 +19,12 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
 | Accueil | Vue plein écran |
 | --- | --- |
 | ![Accueil](docs/screenshot-home.png) | ![Vue CROISSANTÉ](docs/screenshot-croissante.png) |
+
+Écrans de crash (choisis automatiquement selon l'OS) :
+
+| Windows | macOS | Linux |
+| --- | --- | --- |
+| ![Écran bleu](docs/screenshot-crash-windows.png) | ![Kernel panic macOS](docs/screenshot-crash-mac.png) | ![Kernel panic Linux](docs/screenshot-crash-linux.png) |
 
 ## Architecture
 
@@ -43,10 +50,14 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 ├── public/                     # frontend (servi tel quel)
 │   ├── index.html              # formulaire
 │   ├── croissante.html         # vue plein écran
-│   ├── css/style.css
+│   ├── crash.html              # faux écran de crash selon l'OS
+│   ├── css/style.css, css/crash.css
 │   └── js/
 │       ├── app.js              # logique de la page d'accueil
 │       ├── fullscreen.js       # logique de la vue plein écran
+│       ├── crash.js            # logique de l'écran de crash
+│       ├── crash-content.js    # textes des écrans de crash — testés
+│       ├── os.js               # détection de l'OS (locale) — testée
 │       ├── message.js          # logique pure (templates, nettoyage) — testée
 │       ├── config.js           # chargement de /config.json
 │       └── defaults.js         # configuration par défaut (partagée avec le serveur)
@@ -68,6 +79,8 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 | `/?victim=Lucas` | Formulaire pré-rempli (il ne reste qu'à appuyer sur Entrée) |
 | `/?victim=Lucas&by=Flo` | Idem avec le croissanteur |
 | `/croissante?victim=Lucas&by=Flo` | Directement la vue « CROISSANTÉ » |
+| `/crash?victim=Lucas&by=Flo` | Faux écran de crash adapté à l'OS détecté |
+| `/crash?victim=Lucas&os=mac` | Idem en forçant l'OS (`windows`, `mac`, `linux`, `chromeos`, `ios`, `android`) |
 | `/health` | `{"status":"ok"}` (HTTP 200) |
 | `/config.json` | Configuration publique utilisée par le frontend |
 
@@ -75,6 +88,23 @@ Astuce : mettre `/?victim=` en favori pour croissanter encore plus vite.
 
 Les paramètres d'URL sont nettoyés (caractères de contrôle, longueur max) et toujours insérés via `textContent` :
 ils ne sont jamais interprétés comme du HTML.
+
+### Détection de l'OS
+
+L'OS est détecté **dans le navigateur uniquement** (`navigator.userAgentData.platform`, sinon `navigator.userAgent`) ;
+rien n'est envoyé ni enregistré. Il sert à :
+
+- afficher le bon raccourci de verrouillage (`Win + L`, `Ctrl + Cmd + Q`, `Super + L`, `Recherche + L`,
+  texte générique sinon) ;
+- choisir l'écran de crash : Windows (et OS inconnu) → écran bleu ; macOS / iOS → kernel panic multilingue ;
+  Linux / ChromeOS / Android → kernel panic console.
+
+La détection est approximative par nature (un iPad se présente comme un Mac, le user-agent peut être modifié) :
+`?os=` permet de forcer le résultat. Sur Linux, le raccourci dépend de l'environnement de bureau (configurable).
+
+L'écran de crash affiche le message du croissantage (victime, croissanteur, code d'arrêt, raccourci).
+Un clic n'importe où passe en vrai plein écran (geste utilisateur, aucun contournement), le curseur se masque
+après quelques secondes, et les liens « Accueil » / « Vue croissant » restent accessibles au survol ou au clavier (Tab).
 
 Le bouton **Plein écran** de la vue `croissante` appelle `requestFullscreen()` uniquement après un clic
 (aucun contournement des restrictions navigateur). Sans lui, la vue occupe déjà `100vw × 100vh` sans scroll.
@@ -162,7 +192,11 @@ Une valeur invalide est ignorée (avec un avertissement dans les logs).
 | `MESSAGE_TEMPLATE_ANONYMOUS` | `messageTemplateAnonymous` | `🥐 {victim} a été croissanté. …` | Message sans croissanteur |
 | `FULLSCREEN_TITLE` | `fullscreenTitle` | `A ÉTÉ CROISSANTÉ` | Texte principal de la vue plein écran |
 | `FULLSCREEN_BYLINE` | `fullscreenByline` | `par {by}` | Ligne « par … » (vide = masquée) |
-| `FULLSCREEN_SUBTITLE` | `fullscreenSubtitle` | `Pense à Win + L la prochaine fois.` | Texte secondaire |
+| `FULLSCREEN_SUBTITLE` | `fullscreenSubtitle` | `Pense à {shortcut} la prochaine fois.` | Texte secondaire (`{shortcut}` = raccourci de l'OS) |
+| `FULLSCREEN_SUBTITLE_FALLBACK` | `fullscreenSubtitleFallback` | `Pense à verrouiller ton poste la prochaine fois.` | Texte secondaire si l'OS est inconnu |
+| `LOCK_SHORTCUTS` | `lockShortcuts` | `{"windows":"Win + L","mac":"Ctrl + Cmd + Q","linux":"Super + L","chromeos":"Recherche + L"}` | Raccourcis par OS (objet JSON, fusionné avec les défauts) |
+| `ENABLE_CRASH_SCREEN` | `enableCrashScreen` | `true` | Active l'écran de crash (sinon `/crash` renvoie vers la vue croissant) |
+| `CRASH_STOP_CODE` | `crashStopCode` | `CROISSANTS_NOT_DELIVERED` | Code d'arrêt affiché sur l'écran de crash |
 | `PRESET_NAMES` | `presetNames` | *(vide)* | Noms proposés en raccourci (`Lucas,Flo` / tableau JSON) |
 | `REMEMBER_RECENT_NAMES` | `rememberRecentNames` | `false` | Mémorise les derniers noms **dans le navigateur** (localStorage) |
 | `MAX_NAME_LENGTH` | `maxNameLength` | `40` | Longueur max d'un nom |
@@ -170,7 +204,8 @@ Une valeur invalide est ignorée (avec un avertissement dans les logs).
 | `PORT` | — | `8080` | Port d'écoute |
 | `HOST` | — | `0.0.0.0` | Adresse d'écoute |
 
-Les templates acceptent les placeholders `{victim}` et `{by}`. Ils sont traités comme du texte brut.
+Les templates acceptent les placeholders `{victim}` et `{by}` (et `{shortcut}` pour `fullscreenSubtitle`).
+Ils sont traités comme du texte brut.
 
 Exemple :
 
