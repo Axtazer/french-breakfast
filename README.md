@@ -1,5 +1,9 @@
 # Croissanté 🥐
 
+[![CI](https://github.com/Axtazer/french-breakfast/actions/workflows/ci.yml/badge.svg)](https://github.com/Axtazer/french-breakfast/actions/workflows/ci.yml)
+[![Docker publish](https://github.com/Axtazer/french-breakfast/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Axtazer/french-breakfast/actions/workflows/docker-publish.yml)
+[![Licence : GPL v3](https://img.shields.io/badge/licence-GPL--3.0-blue.svg)](LICENSE)
+
 Petite application web pour **« croissanter »** un collègue qui a laissé son PC déverrouillé en open space.
 
 La tradition : quand quelqu'un quitte son poste sans le verrouiller, un collègue envoie un message depuis ce poste
@@ -44,12 +48,16 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 ```
 .
 ├── .github/
+│   ├── CODEOWNERS, pull_request_template.md, ISSUE_TEMPLATE/
 │   ├── dependabot.yml          # mises à jour (actions, image de base, devDeps)
+│   ├── release.yml             # catégories des notes de release
+│   ├── rulesets/               # règles de merge importables (main, tags)
 │   └── workflows/
 │       ├── ci.yml              # lint + tests + build Docker + smoke test
-│       └── docker-publish.yml  # publication sur GHCR
+│       ├── docker-publish.yml  # publication sur GHCR
+│       └── release.yml         # GitHub Release à chaque tag vX.Y.Z
 ├── deploy/kubernetes.yaml      # exemple Deployment + Service
-├── docs/                       # captures d'écran
+├── docs/                       # captures d'écran, configuration du dépôt GitHub
 ├── public/                     # frontend (servi tel quel)
 │   ├── index.html              # formulaire
 │   ├── croissante.html         # vue plein écran
@@ -136,6 +144,7 @@ Autres commandes :
 npm start        # lancement simple
 npm run lint     # ESLint
 npm test         # tests (node --test)
+npm run check    # lint + tests (avant chaque push)
 ```
 
 ## Docker
@@ -169,6 +178,9 @@ Le projet suit [Semantic Versioning](https://semver.org/lang/fr/). Pour publier 
 git tag v1.0.0
 git push origin v1.0.0
 ```
+
+Le tag publie l'image Docker et crée une **GitHub Release** avec des notes générées à partir des PR mergées.
+Les tags `v*` sont protégés (ni déplacés, ni supprimés) : une version publiée est immuable.
 
 | Événement | Tags publiés |
 | --- | --- |
@@ -274,6 +286,14 @@ Servir l'application en **HTTPS** est recommandé (l'API Clipboard moderne l'exi
   `Strict-Transport-Security` est laissé au reverse proxy qui termine le TLS.
 - **Aucun secret** dans le dépôt ni nécessaire au fonctionnement. La publication GHCR utilise le `GITHUB_TOKEN`
   éphémère fourni par GitHub Actions.
+
+## Contribuer
+
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) : branche + Pull Request, CI verte, squash merge avec un titre au format
+Conventional Commits (`feat: …`, `fix: …`). `main` est protégée par les rulesets de [`.github/rulesets/`](.github/rulesets) ;
+leur activation et les autres réglages du dépôt sont décrits dans [docs/REPOSITORY_SETUP.md](docs/REPOSITORY_SETUP.md).
+
+Vulnérabilité : voir [SECURITY.md](SECURITY.md) (signalement privé, pas d'issue publique).
 
 ## Licence
 

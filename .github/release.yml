@@ -1,0 +1,11 @@
+# Catégories des notes de release générées automatiquement (selon les labels des PR).
+changelog:
+  categories:
+    - title: 💥 Changements cassants
+      labels: [breaking-change]
+    - title: ✨ Nouveautés
+      labels: [enhancement, feature]
+    - title: 🐛 Correctifs
+      labels: [bug, fix]
+    - title: 🧰 Maintenance
+      labels: ['*']
