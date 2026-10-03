@@ -1,0 +1,13 @@
+{
+  "appName": "Croissanté",
+  "tagline": "Un PC déverrouillé, des croissants pour toute l’équipe.",
+  "enableByField": true,
+  "messageTemplate": "🥐 {victim} a été croissanté par {by}. Poste laissé déverrouillé : les croissants sont attendus !",
+  "messageTemplateAnonymous": "🥐 {victim} a été croissanté. Poste laissé déverrouillé : les croissants sont attendus !",
+  "fullscreenTitle": "A ÉTÉ CROISSANTÉ",
+  "fullscreenByline": "par {by}",
+  "fullscreenSubtitle": "Pense à Win + L la prochaine fois.",
+  "presetNames": ["Lucas", "Flo"],
+  "rememberRecentNames": false,
+  "maxNameLength": 40
+}

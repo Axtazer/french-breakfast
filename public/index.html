@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Croissanté 🥐</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/app.js"></script>
+  </head>
+  <body class="home">
+    <main class="card">
+      <header class="brand">
+        <span class="brand-logo" aria-hidden="true">🥐</span>
+        <h1 id="app-name">Croissanté</h1>
+        <p id="tagline" class="tagline">Un PC déverrouillé, des croissants pour toute l’équipe.</p>
+      </header>
+
+      <noscript>
+        <p class="notice">JavaScript est nécessaire pour générer le message.</p>
+      </noscript>
+
+      <form id="croissant-form" class="form" autocomplete="off" novalidate>
+        <div class="field">
+          <label for="victim">Qui a laissé son PC déverrouillé ?</label>
+          <input id="victim" name="victim" type="text" required maxlength="40"
+                 placeholder="Lucas" spellcheck="false" aria-describedby="victim-error" />
+          <p id="victim-error" class="field-error" role="alert" hidden>Indique un nom 🙂</p>
+          <div id="presets" class="chips" aria-label="Noms rapides" hidden></div>
+        </div>
+
+        <div class="field" id="by-field">
+          <label for="by">Qui croissante ? <span class="optional">(facultatif)</span></label>
+          <input id="by" name="by" type="text" maxlength="40" placeholder="Flo" spellcheck="false" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">🥐 CROISSANTER</button>
+      </form>
+
+      <section id="result" class="result" aria-labelledby="result-title" hidden>
+        <h2 id="result-title" class="visually-hidden">Message généré</h2>
+        <label for="message" class="visually-hidden">Message à copier</label>
+        <textarea id="message" class="message" rows="3" readonly></textarea>
+        <div class="actions">
+          <button type="button" id="copy-btn" class="btn btn-secondary">Copier le message</button>
+          <a id="fullscreen-link" class="btn btn-ghost" href="croissante">Afficher en plein écran</a>
+        </div>
+        <p id="copy-feedback" class="feedback" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      Aucune donnée envoyée ni stockée — tout se passe dans ton navigateur.
+    </footer>
+  </body>
+</html>

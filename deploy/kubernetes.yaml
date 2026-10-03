@@ -1,0 +1,83 @@
+# Exemple minimal et générique de déploiement de Croissanté.
+# Remplacer ghcr.io/OWNER/REPO par l'image réelle (en minuscules).
+# Conseil : en production, épingler une version (ex. :1.2.3) et passer imagePullPolicy à IfNotPresent.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: croissante
+  labels:
+    app.kubernetes.io/name: croissante
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: croissante
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: croissante
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: croissante
+          image: ghcr.io/OWNER/REPO:latest
+          # :latest est un tag mobile -> Always pour récupérer la dernière release.
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+            # Configuration optionnelle (aucun secret nécessaire) :
+            # - name: APP_NAME
+            #   value: "Croissanté"
+            # - name: PRESET_NAMES
+            #   value: "Lucas,Flo"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: croissante
+  labels:
+    app.kubernetes.io/name: croissante
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: croissante
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
