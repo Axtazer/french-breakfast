@@ -2,7 +2,7 @@
 
 /**
  * L'écran s'affiche sur le poste de la victime : il s'adresse directement à elle, sans la nommer.
- * @param {{ by: string, message: string, hint: string, stopCode: string }} ctx
+ * @param {{ by: string, message: string, hint: string, stopCode: string, time: string }} ctx
  */
 export function windowsCrash(ctx) {
   return {
@@ -10,6 +10,7 @@ export function windowsCrash(ctx) {
     message: ctx.message,
     stopCode: ctx.stopCode,
     by: ctx.by ? `Croissanté par : ${ctx.by}` : '',
+    time: `Heure du croissantage : ${ctx.time}`,
     hint: `verrouillage.sys — ${ctx.hint}`,
     done: '🥐 Redémarrage impossible tant que les croissants ne sont pas arrivés.',
   };
@@ -22,6 +23,7 @@ export function macCrash(ctx) {
     de: 'Sie müssen Croissants mitbringen. Dieser Rechner wurde nicht gesperrt.',
     ja: 'クロワッサンを持ってくる必要があります。このコンピュータはロックされていませんでした。',
     message: ctx.message,
+    time: `Croissanté à ${ctx.time}`,
     hint: ctx.hint,
   };
 }
@@ -30,7 +32,7 @@ export function linuxCrash(ctx) {
   const lines = [
     '[    0.000000] Linux version 6.6.6-croissant (boulanger@fournil) (gcc 14.2.0) #1 SMP PREEMPT_DYNAMIC',
     '[    0.004217] Command line: BOOT_IMAGE=/vmlinuz-croissant root=/dev/fournil ro quiet splash',
-    '[ 4242.000001] session: current user left the session unlocked',
+    `[ 4242.000001] session: current user left the session unlocked (croissanted at ${ctx.time})`,
     '[ 4242.000023] croissant: checking croissant supply... 0 found',
   ];
   if (ctx.by) lines.push(`[ 4242.000031] croissant: session croissanted by ${JSON.stringify(ctx.by)}`);
@@ -49,37 +51,12 @@ export function linuxCrash(ctx) {
   return lines;
 }
 
-/** Faux QR code déterministe (purement décoratif) : matrice size × size de booléens. */
-export function fakeQrMatrix(seed, size = 25) {
-  let h = 2166136261;
-  for (const ch of String(seed)) {
-    h ^= ch.codePointAt(0);
-    h = Math.imul(h, 16777619);
-  }
-  const next = () => {
-    h ^= h << 13;
-    h ^= h >>> 17;
-    h ^= h << 5;
-    return (h >>> 0) % 100;
-  };
-  const inFinder = (r, c, r0, c0) => r >= r0 && r < r0 + 7 && c >= c0 && c < c0 + 7;
-  const finderCell = (r, c) => {
-    const ring = Math.max(Math.abs(r - 3), Math.abs(c - 3));
-    return ring !== 2;
-  };
-  const matrix = [];
-  for (let r = 0; r < size; r++) {
-    const row = [];
-    for (let c = 0; c < size; c++) {
-      const corners = [
-        [0, 0],
-        [0, size - 7],
-        [size - 7, 0],
-      ];
-      const corner = corners.find(([r0, c0]) => inFinder(r, c, r0, c0));
-      row.push(corner ? finderCell(r - corner[0], c - corner[1]) : next() < 48);
-    }
-    matrix.push(row);
-  }
-  return matrix;
+/** Heure du croissantage au format français : "15h42". */
+export function formatCrashTime(date = new Date()) {
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${hh}h${mm}`;
 }
+
+/** Cible du QR code de l'écran Windows (image statique générée par `npm run qr`). */
+export const CRASH_QR_URL = 'https://www.google.com/maps/search/?api=1&query=boulangerie';

@@ -16,7 +16,7 @@ test('les variables d’environnement surchargent la config', () => {
     {
       APP_NAME: 'Chocolatine',
       ENABLE_BY_FIELD: 'false',
-      PRESET_NAMES: ' Lucas, Flo ,,Sam ',
+      PRESET_NAMES: ' Alex, Camille ,,Sam ',
       REMEMBER_RECENT_NAMES: 'true',
       MAX_NAME_LENGTH: '20',
       MESSAGE_TEMPLATES: "Salut ! Je ramène les croissants, promis.| |Hello ! C'est pour moi.",
@@ -25,7 +25,7 @@ test('les variables d’environnement surchargent la config', () => {
   );
   assert.equal(config.appName, 'Chocolatine');
   assert.equal(config.enableByField, false);
-  assert.deepEqual(config.presetNames, ['Lucas', 'Flo', 'Sam']);
+  assert.deepEqual(config.presetNames, ['Alex', 'Camille', 'Sam']);
   assert.equal(config.rememberRecentNames, true);
   assert.equal(config.maxNameLength, 20);
   assert.deepEqual(config.messageTemplates, ['Salut ! Je ramène les croissants, promis.', "Hello ! C'est pour moi."]);

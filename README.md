@@ -9,23 +9,21 @@ Petite application web pour **« croissanter »** un collègue qui a laissé son
 La tradition : quand quelqu'un quitte son poste sans le verrouiller, un collègue envoie un message depuis ce poste
 pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l'opération rapide, propre et amusante :
 
-1. depuis le poste déverrouillé, ouvrir l'app et cliquer sur **🥐 CROISSANTER** ;
-2. un message crédible est tiré au hasard, comme si la victime l'avait écrit elle-même
-   (« Salut tout le monde ! C'est moi qui ramène les croissants au prochain cours du matin. ») ;
-   🎲 pour en changer, mention facultative de collègues (« Et oui, même pour Damien, Margaux et Sébastien ! »),
-   et le texte reste modifiable ;
-3. **copier** le message et le coller dans Teams, Slack… : il part **avec le compte de la victime** ;
-4. afficher la page **CROISSANTÉ** en plein écran sur le poste concerné,
-   ou un **faux écran de crash** adapté à l'OS du poste (écran de crash Windows version orange, kernel panic macOS ou Linux).
+1. depuis le poste déverrouillé, ouvrir l'app : un message crédible est déjà prêt, comme si la victime l'avait écrit
+   (« Salut tout le monde ! La prochaine fois qu'on se voit au p'tit matin, c'est moi qui ramène les croissants. ») ;
+   🎲 pour en changer, mention facultative de collègues (« Et oui, même pour Camille, Sam et Léo ! ») ;
+2. **un clic sur le message le copie** (ou bouton 📋) : le coller dans Teams, Slack… il part **avec le compte de la victime** ;
+3. **🥐 CROISSANTER** : un **faux écran de crash** adapté à l'OS du poste s'affiche aussitôt **en plein écran**
+   (écran de crash Windows version orange, kernel panic macOS ou Linux).
 
 > L'application **n'envoie rien** : elle génère uniquement un message prêt à copier/coller.
 > Aucun compte, aucun secret, aucune intégration Teams/mail.
 
 ## Screenshot
 
-| Accueil | Vue plein écran |
+| Accueil (desktop) | Accueil (mobile) |
 | --- | --- |
-| ![Accueil](docs/screenshot-home.png) | ![Vue CROISSANTÉ](docs/screenshot-croissante.png) |
+| ![Accueil](docs/screenshot-home.png) | ![Accueil sur mobile](docs/screenshot-home-mobile.png) |
 
 Écrans de crash (choisis automatiquement selon l'OS) :
 
@@ -60,18 +58,22 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 ├── docs/                       # captures d'écran, configuration du dépôt GitHub
 ├── public/                     # frontend (servi tel quel)
 │   ├── index.html              # formulaire
-│   ├── croissante.html         # vue plein écran
+│   ├── croissante.html         # vue alternative « CE PC A ÉTÉ CROISSANTÉ »
 │   ├── crash.html              # faux écran de crash selon l'OS
 │   ├── css/style.css, css/crash.css
+│   ├── img/croissant.svg       # logo
+│   ├── img/qr-boulangerie.svg  # QR code de l'écran de crash (généré)
 │   └── js/
 │       ├── app.js              # logique de la page d'accueil
-│       ├── fullscreen.js       # logique de la vue plein écran
-│       ├── crash.js            # logique de l'écran de crash
+│       ├── fullscreen.js       # logique de la vue alternative
+│       ├── crash.js            # page /crash (accès direct)
+│       ├── crash-view.js       # rendu des écrans de crash (accueil et /crash)
 │       ├── crash-content.js    # textes des écrans de crash — testés
 │       ├── os.js               # détection de l'OS (locale) — testée
 │       ├── message.js          # logique pure (templates, nettoyage) — testée
 │       ├── config.js           # chargement de /config.json
 │       └── defaults.js         # configuration par défaut (partagée avec le serveur)
+├── scripts/generate-qr.mjs     # régénère le QR code (npm run qr)
 ├── src/
 │   ├── server.js               # serveur HTTP
 │   ├── config.js               # chargement de la config (défauts < CONFIG_FILE < env)
@@ -87,18 +89,19 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 | URL | Effet |
 | --- | --- |
 | `/` | Formulaire |
-| `/?with=Damien,Margaux` | Formulaire avec des collègues à mentionner pré-remplis |
-| `/?by=Flo` | Formulaire avec le croissanteur pré-rempli (il ne reste qu'à appuyer sur Entrée) |
-| `/croissante?by=Flo` | Directement la vue « CE PC A ÉTÉ CROISSANTÉ » |
-| `/crash?by=Flo` | Faux écran de crash adapté à l'OS détecté (`with` et `m` = mentions et n° de message) |
+| `/?with=Camille,Sam` | Formulaire avec des collègues à mentionner pré-remplis |
+| `/?by=Alex` | Formulaire avec le croissanteur pré-rempli |
+| `/croissante?by=Alex` | Vue alternative « CE PC A ÉTÉ CROISSANTÉ » (non liée depuis l'accueil) |
+| `/crash?by=Alex` | Faux écran de crash adapté à l'OS détecté (`with` et `m` = mentions et n° de message) |
 | `/crash?os=mac` | Idem en forçant l'OS (`windows`, `mac`, `linux`, `chromeos`, `ios`, `android`) |
 | `/health` | `{"status":"ok"}` (HTTP 200) |
 | `/config.json` | Configuration publique utilisée par le frontend |
 
 Le nom de la victime n'est jamais demandé : le message est envoyé depuis son poste, donc avec son propre compte,
 et doit avoir l'air écrit par elle. Le croissanteur n'apparaît jamais dans le message (ça grillerait la blague),
-seulement sur la vue plein écran et l'écran de crash.
-Le bouton **🥐 CROISSANTER** a le focus à l'ouverture : il suffit d'appuyer sur Entrée.
+seulement sur l'écran de crash.
+
+Le message n'est pas modifiable : il est conçu pour être copié tel quel, sans risque d'erreur de copier-coller.
 
 Astuce : mettre `/?by=VotrePrénom` en favori pour croissanter encore plus vite.
 
@@ -118,23 +121,27 @@ rien n'est envoyé ni enregistré. Il sert à :
 La détection est approximative par nature (un iPad se présente comme un Mac, le user-agent peut être modifié) :
 `?os=` permet de forcer le résultat. Sur Linux, le raccourci dépend de l'environnement de bureau (configurable).
 
-L'écran de crash affiche le message du croissantage (croissanteur, code d'arrêt, raccourci).
-Un clic n'importe où passe en vrai plein écran (geste utilisateur, aucun contournement), le curseur se masque
-après quelques secondes, et les liens « Accueil » / « Vue croissant » restent accessibles au survol ou au clavier (Tab).
-
-Le bouton **Plein écran** de la vue `croissante` appelle `requestFullscreen()` uniquement après un clic
-(aucun contournement des restrictions navigateur). Sans lui, la vue occupe déjà `100vw × 100vh` sans scroll.
+L'écran de crash affiche le message du croissantage, l'**heure du croissantage**, le croissanteur, le code d'arrêt et
+le raccourci de verrouillage. Sur l'écran Windows, le **QR code** est un vrai QR code qui ouvre
+[les boulangeries à proximité sur Google Maps](https://www.google.com/maps/search/?api=1&query=boulangerie).
+C'est une image statique (`public/img/qr-boulangerie.svg`) générée par `npm run qr` (`scripts/generate-qr.mjs`) :
+aucune requête externe tant que personne ne le scanne.
+Depuis l'accueil, **🥐 CROISSANTER** l'affiche dans la même page et appelle `requestFullscreen()` dans le même clic :
+c'est ce geste utilisateur qui autorise le plein écran (aucun contournement des restrictions navigateur).
+En accès direct à `/crash`, le navigateur exige un clic : un clic n'importe où passe alors en plein écran.
+Le curseur se masque après quelques secondes ; le bouton « ← Accueil » reste accessible au survol (en bas à droite)
+ou au clavier (Tab).
 
 La copie utilise l'API Clipboard (`navigator.clipboard.writeText`). Celle-ci n'est disponible qu'en contexte sécurisé
 (HTTPS ou `localhost`) ; en HTTP simple sur un intranet, un repli (`document.execCommand('copy')`) est utilisé, et
-si tout échoue le texte est sélectionné pour un Ctrl + C manuel.
+si tout échoue un message invite à copier manuellement.
 
 ## Lancement local
 
 Prérequis : Node.js ≥ 22.
 
 ```bash
-npm install      # dépendances de dev uniquement (ESLint)
+npm install      # dépendances de dev uniquement (ESLint, qrcode)
 npm run dev      # http://localhost:8080, redémarre à chaque modification
 ```
 
@@ -145,6 +152,7 @@ npm start        # lancement simple
 npm run lint     # ESLint
 npm test         # tests (node --test)
 npm run check    # lint + tests (avant chaque push)
+npm run qr       # régénère le QR code de l'écran de crash
 ```
 
 ## Docker
@@ -208,7 +216,7 @@ Une valeur invalide est ignorée (avec un avertissement dans les logs).
 | `APP_NAME` | `appName` | `Croissanté` | Nom affiché |
 | `APP_TAGLINE` | `tagline` | `Un PC déverrouillé, …` | Sous-titre |
 | `ENABLE_BY_FIELD` | `enableByField` | `true` | Affiche le champ « Qui croissante ? » |
-| `MESSAGE_TEMPLATES` | `messageTemplates` | 5 messages (« Salut tout le monde ! C'est moi qui ramène les croissants… ») | Messages tirés au hasard. Env : séparés par `\|` ; JSON : tableau |
+| `MESSAGE_TEMPLATES` | `messageTemplates` | 5 messages (« Salut tout le monde ! La prochaine fois qu'on se voit au p'tit matin… ») | Messages tirés au hasard. Env : séparés par `\|` ; JSON : tableau |
 | `INCLUDE_TEMPLATE` | `includeTemplate` | `Et oui, même pour {names} !` | Phrase ajoutée si des collègues sont mentionnés (vide = désactivé) |
 | `FULLSCREEN_SUBJECT` | `fullscreenSubject` | `Ce PC` | Gros texte de la vue plein écran |
 | `FULLSCREEN_TITLE` | `fullscreenTitle` | `A ÉTÉ CROISSANTÉ` | Texte principal de la vue plein écran |
@@ -218,7 +226,7 @@ Une valeur invalide est ignorée (avec un avertissement dans les logs).
 | `LOCK_SHORTCUTS` | `lockShortcuts` | `{"windows":"Win + L","mac":"Ctrl + Cmd + Q","linux":"Super + L","chromeos":"Recherche + L"}` | Raccourcis par OS (objet JSON, fusionné avec les défauts) |
 | `ENABLE_CRASH_SCREEN` | `enableCrashScreen` | `true` | Active l'écran de crash (sinon `/crash` renvoie vers la vue croissant) |
 | `CRASH_STOP_CODE` | `crashStopCode` | `CROISSANTS_NOT_DELIVERED` | Code d'arrêt affiché sur l'écran de crash |
-| `PRESET_NAMES` | `presetNames` | *(vide)* | Collègues proposés en un clic pour la mention (`Damien,Margaux` / tableau JSON) |
+| `PRESET_NAMES` | `presetNames` | *(vide)* | Collègues proposés en un clic pour la mention (`Camille,Sam` / tableau JSON) |
 | `REMEMBER_RECENT_NAMES` | `rememberRecentNames` | `false` | Mémorise les derniers collègues mentionnés **dans le navigateur** (localStorage) |
 | `MAX_NAME_LENGTH` | `maxNameLength` | `40` | Longueur max d'un nom |
 | `CONFIG_FILE` | — | — | Chemin d'un fichier JSON (voir `config.example.json`) |
@@ -227,14 +235,14 @@ Une valeur invalide est ignorée (avec un avertissement dans les logs).
 
 Placeholders : `{names}` dans `includeTemplate`, `{by}` dans `fullscreenByline`, `{shortcut}` dans `fullscreenSubtitle`.
 Les messages sont envoyés depuis le compte de la victime : écrivez-les à la première personne, sans mention du croissanteur.
-Les textes par défaut parlent du « prochain cours du matin » : adaptez-les à votre contexte.
+Les textes par défaut restent volontairement génériques (« au p'tit matin quand on se voit ») : adaptez-les à votre contexte.
 Ils sont traités comme du texte brut.
 
 Exemple :
 
 ```bash
 docker run --rm -p 8080:8080 \
-  -e PRESET_NAMES="Damien,Margaux,Sébastien" \
+  -e PRESET_NAMES="Camille,Sam,Léo" \
   -e MESSAGE_TEMPLATES="Salut l'équipe ! Les croissants sont pour moi demain matin.|Hello ! Demain, petit-déj offert par moi." \
   ghcr.io/OWNER/REPO:latest
 ```
@@ -273,7 +281,7 @@ Servir l'application en **HTTPS** est recommandé (l'API Clipboard moderne l'exi
 ## Sécurité et vie privée
 
 - **Aucun tracking**, aucune analytics, aucune publicité, aucun cookie.
-- **Aucune ressource externe** (pas de Google Fonts, pas de CDN) : polices système et emoji natifs.
+- **Aucune ressource externe** (pas de Google Fonts, pas de CDN) : polices système, logo SVG embarqué.
 - **Aucun stockage par défaut** : le nom saisi ne sert qu'à générer le message localement, dans le navigateur.
   Le serveur ne reçoit les noms que s'ils sont dans l'URL, et ne les journalise pas.
   La mémorisation des derniers noms (`REMEMBER_RECENT_NAMES`) est désactivée par défaut et reste locale au navigateur.

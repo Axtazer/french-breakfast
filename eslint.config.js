@@ -27,7 +27,7 @@ export default [
     },
   },
   {
-    files: ['src/**/*.js', 'test/**/*.js', 'eslint.config.js'],
+    files: ['src/**/*.js', 'test/**/*.js', 'scripts/**/*.mjs', 'eslint.config.js'],
     languageOptions: { globals: globals.node },
   },
   {

@@ -22,7 +22,7 @@ export function renderTemplate(template, values) {
 
 const MAX_NAMES = 10;
 
-/** Découpe "damien, margaux et sébastien" en noms nettoyés (dédoublonnés, 10 max). */
+/** Découpe "camille, sam et léo" en noms nettoyés (dédoublonnés, 10 max). */
 export function parseNames(value, maxLength = DEFAULT_MAX_NAME_LENGTH) {
   if (typeof value !== 'string') return [];
   const names = value

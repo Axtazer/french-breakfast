@@ -3,8 +3,8 @@
   "tagline": "Un PC déverrouillé, des croissants pour toute l’équipe.",
   "enableByField": true,
   "messageTemplates": [
-    "Salut tout le monde ! C'est moi qui ramène les croissants au prochain cours du matin.",
-    "Hello ! Petit-déjeuner offert : je ramène les croissants au prochain cours du matin."
+    "Salut tout le monde ! La prochaine fois qu'on se voit au p'tit matin, c'est moi qui ramène les croissants.",
+    "Bonjour à tous ! Au p'tit matin de nos retrouvailles, je débarque avec les croissants."
   ],
   "includeTemplate": "Et oui, même pour {names} !",
   "fullscreenSubject": "Ce PC",
@@ -20,11 +20,7 @@
   },
   "enableCrashScreen": true,
   "crashStopCode": "CROISSANTS_NOT_DELIVERED",
-  "presetNames": [
-    "Damien",
-    "Margaux",
-    "Sébastien"
-  ],
+  "presetNames": [],
   "rememberRecentNames": false,
   "maxNameLength": 40
 }

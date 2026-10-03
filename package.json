@@ -14,11 +14,13 @@
     "dev": "node --watch-path=src --watch-path=public src/server.js",
     "lint": "eslint .",
     "test": "node --test",
-    "check": "npm run lint && npm test"
+    "check": "npm run lint && npm test",
+    "qr": "node scripts/generate-qr.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.12.0",
-    "globals": "^17.13.0"
+    "globals": "^17.13.0",
+    "qrcode": "^1.5.4"
   }
 }

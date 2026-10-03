@@ -40,7 +40,7 @@ spec:
             # - name: APP_NAME
             #   value: "Croissanté"
             # - name: PRESET_NAMES
-            #   value: "Lucas,Flo"
+            #   value: "Alex,Camille,Sam"
           readinessProbe:
             httpGet:
               path: /health

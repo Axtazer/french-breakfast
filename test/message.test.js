@@ -31,14 +31,14 @@ test('buildMessage sélectionne le template par index (modulo)', () => {
 
 test('buildMessage ajoute la phrase de mention des collègues', () => {
   assert.equal(
-    buildMessage(DEFAULT_CONFIG, 0, ['Damien', 'Margaux', 'Sébastien']),
-    "Salut tout le monde ! C'est moi qui ramène les croissants au prochain cours du matin. Et oui, même pour Damien, Margaux et Sébastien !",
+    buildMessage(DEFAULT_CONFIG, 0, ['Camille', 'Sam', 'Léo']),
+    "Salut tout le monde ! La prochaine fois qu'on se voit au p'tit matin, c'est moi qui ramène les croissants. Et oui, même pour Camille, Sam et Léo !",
   );
-  assert.equal(buildMessage({ ...DEFAULT_CONFIG, includeTemplate: '' }, 0, ['Damien']), DEFAULT_CONFIG.messageTemplates[0]);
+  assert.equal(buildMessage({ ...DEFAULT_CONFIG, includeTemplate: '' }, 0, ['Camille']), DEFAULT_CONFIG.messageTemplates[0]);
 });
 
 test('parseNames découpe virgules, point-virgules et "et"', () => {
-  assert.deepEqual(parseNames('damien, margaux et sébastien'), ['damien', 'margaux', 'sébastien']);
+  assert.deepEqual(parseNames('camille, sam et léo'), ['camille', 'sam', 'léo']);
   assert.deepEqual(parseNames('A;B & C, , A'), ['A', 'B', 'C']);
   assert.deepEqual(parseNames('Étienne'), ['Étienne']);
   assert.deepEqual(parseNames(''), []);
@@ -74,17 +74,17 @@ test('sanitizeName nettoie espaces, contrôles et bidi, et tronque', () => {
 });
 
 test('readParams lit by, with et m sans leur faire confiance', () => {
-  assert.deepEqual(readParams('?by=Flo&with=Damien,Margaux&m=3'), { by: 'Flo', names: ['Damien', 'Margaux'], index: 3 });
+  assert.deepEqual(readParams('?by=Alex&with=Camille,Sam&m=3'), { by: 'Alex', names: ['Camille', 'Sam'], index: 3 });
   assert.deepEqual(readParams('?m=-1'), { by: '', names: [], index: 0 });
   assert.deepEqual(readParams('?m=abc'), { by: '', names: [], index: 0 });
   assert.deepEqual(readParams('?m=999'), { by: '', names: [], index: 0 });
 });
 
 test('les liens sont relatifs et réversibles', () => {
-  assert.equal(fullscreenHref('Flo'), 'croissante?by=Flo');
+  assert.equal(fullscreenHref('Alex'), 'croissante?by=Alex');
   assert.equal(fullscreenHref(''), 'croissante');
   assert.equal(crashHref(), 'crash');
-  const href = crashHref({ by: 'A&B', names: ['Damien', 'é <x>'], index: 2 });
-  assert.equal(href, 'crash?by=A%26B&with=Damien%2C%C3%A9+%3Cx%3E&m=2');
-  assert.deepEqual(readParams(href.split('?')[1]), { by: 'A&B', names: ['Damien', 'é <x>'], index: 2 });
+  const href = crashHref({ by: 'A&B', names: ['Camille', 'é <x>'], index: 2 });
+  assert.equal(href, 'crash?by=A%26B&with=Camille%2C%C3%A9+%3Cx%3E&m=2');
+  assert.deepEqual(readParams(href.split('?')[1]), { by: 'A&B', names: ['Camille', 'é <x>'], index: 2 });
 });

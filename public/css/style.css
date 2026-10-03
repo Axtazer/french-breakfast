@@ -49,7 +49,12 @@ body {
   white-space: nowrap;
 }
 
-/* ---------- Accueil ---------- */
+/* ---------- Accueil (mobile d'abord) ---------- */
+
+html {
+  /* Texte légèrement plus grand sur les très grands écrans. */
+  font-size: clamp(16px, 0.35vw + 12px, 20px);
+}
 
 .home {
   min-height: 100vh;
@@ -58,7 +63,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(16px, 4vw, 48px) 16px;
+  padding: 16px;
   background:
     radial-gradient(ellipse at top, rgba(242, 181, 68, 0.12), transparent 60%),
     var(--bg);
@@ -66,8 +71,8 @@ body {
 
 .card {
   width: 100%;
-  max-width: 34rem;
-  padding: clamp(20px, 5vw, 40px);
+  max-width: 44rem;
+  padding: 20px;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) * 1.5);
@@ -75,50 +80,45 @@ body {
 }
 
 .brand {
-  text-align: center;
-  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
 .brand-logo {
-  display: block;
-  font-family: var(--emoji);
-  font-size: clamp(4rem, 14vw, 6rem);
-  line-height: 1;
+  flex: none;
+  width: 3.5rem;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
   animation: wobble 4s ease-in-out infinite;
 }
 
 .brand h1 {
-  margin: 12px 0 4px;
-  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.15;
   letter-spacing: -0.02em;
 }
 
 .tagline {
-  margin: 0;
+  margin: 2px 0 0;
   color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
-.form {
+.fields {
   display: grid;
-  gap: 20px;
+  gap: 14px;
 }
 
 .field {
   display: grid;
-  gap: 8px;
-}
-
-.field-help {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.form-hint {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  text-align: center;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
 }
 
 label {
@@ -127,15 +127,15 @@ label {
 
 .optional {
   font-weight: 400;
+  font-size: 0.9em;
   color: var(--text-muted);
 }
 
-input[type='text'],
-.message {
+input[type='text'] {
   width: 100%;
-  padding: 14px 16px;
+  padding: 11px 14px;
   font: inherit;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--border);
@@ -143,31 +143,35 @@ input[type='text'],
   transition: border-color 0.15s;
 }
 
-input[type='text']:hover,
-.message:hover {
+input[type='text']:hover {
   border-color: #4d463e;
 }
 
-input[type='text']:focus-visible,
-.message:focus-visible {
+input[type='text']:focus-visible {
   outline-offset: 0;
   border-color: var(--accent);
 }
 
 input::placeholder {
-  color: #7d7468;
+  color: #8a8175;
+}
+
+.field-help {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .chip {
-  padding: 6px 12px;
+  padding: 4px 12px;
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text);
   background: transparent;
   border: 1px solid var(--border);
@@ -189,11 +193,12 @@ input::placeholder {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 12px 20px;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 14px;
   font: inherit;
   font-weight: 700;
+  white-space: nowrap;
   text-decoration: none;
   border-radius: var(--radius);
   border: 1px solid transparent;
@@ -210,9 +215,9 @@ input::placeholder {
 
 .btn-primary {
   width: 100%;
-  min-height: 64px;
-  margin-top: 4px;
-  font-size: clamp(1.2rem, 4vw, 1.45rem);
+  min-height: 56px;
+  margin-top: 14px;
+  font-size: 1.25rem;
   letter-spacing: 0.04em;
   color: var(--accent-text);
   background: var(--accent);
@@ -243,33 +248,72 @@ input::placeholder {
 }
 
 .result {
-  margin-top: 28px;
-  padding-top: 24px;
-  border-top: 1px dashed var(--border);
-  animation: fade-in 0.25s ease-out;
+  margin-top: 16px;
 }
 
-.message {
-  resize: vertical;
-  min-height: 6rem;
+/* Le message : un clic le copie, il n'est pas modifiable. */
+.message-box {
+  display: block;
+  width: 100%;
+  padding: 12px 14px 10px;
+  font: inherit;
+  font-size: 1rem;
   line-height: 1.45;
+  text-align: left;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px dashed #5a5248;
+  border-radius: var(--radius);
+  cursor: copy;
+  user-select: none;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.message-box:hover {
+  border-color: var(--accent);
+  background: #17150f;
+}
+
+.message-box:active {
+  transform: scale(0.995);
+}
+
+.message-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: right;
 }
 
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-.message-label {
-  display: block;
-  margin-bottom: 8px;
+.actions .btn {
+  min-width: 0;
+}
+
+/* Zone de texte temporaire pour le repli de copie (hors écran). */
+.clipboard-proxy {
+  position: fixed;
+  top: 0;
+  left: -9999px;
+  opacity: 0;
+}
+
+.is-crashing {
+  overflow: hidden;
 }
 
 .feedback {
   min-height: 1.5em;
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   font-weight: 600;
   text-align: center;
 }
@@ -289,15 +333,191 @@ input::placeholder {
 }
 
 .footer {
-  margin-top: 24px;
-  font-size: 0.85rem;
+  max-width: 44rem;
+  margin-top: 14px;
+  font-size: 0.8rem;
+  line-height: 1.5;
   color: var(--text-muted);
   text-align: center;
 }
 
-@media (max-width: 420px) {
+/* Signature flottante en bas de page. */
+.credit {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  pointer-events: none;
+}
+
+.home {
+  padding-bottom: 32px;
+}
+
+/* Tablette et plus : champs côte à côte, carte plus aérée. */
+@media (min-width: 640px) {
+  .card {
+    padding: 28px 32px;
+  }
+
+  .brand-logo {
+    width: 4.5rem;
+  }
+
+  .brand h1 {
+    font-size: 2rem;
+  }
+
+  .fields {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .fields label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .message-box {
+    font-size: 1.05rem;
+  }
+
+  .btn-primary {
+    min-height: 64px;
+    font-size: 1.4rem;
+  }
+}
+
+/* Écrans peu hauts (laptop 768 px, mobile en paysage) : on resserre. */
+@media (max-height: 760px) {
+  .home {
+    padding-top: 12px;
+    padding-bottom: 30px;
+  }
+
+  .card {
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .brand {
+    margin-bottom: 12px;
+  }
+
+  .brand-logo {
+    width: 3rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .field-help,
+  .message-hint {
+    display: none;
+  }
+
+  .result {
+    margin-top: 12px;
+  }
+
+  .btn-primary {
+    min-height: 50px;
+  }
+
+  .footer {
+    margin-top: 8px;
+  }
+}
+
+/* Très peu haut (mobile en paysage) : en-tête minimal, tout resserré. */
+@media (max-height: 480px) {
+  .brand-logo,
+  .tagline,
+  .footer,
+  .chips {
+    display: none;
+  }
+
+  .home,
+  .card {
+    padding: 8px 16px;
+  }
+
+  .home {
+    padding-bottom: 26px;
+  }
+
+  .credit {
+    bottom: 4px;
+    font-size: 0.7rem;
+  }
+
+  .brand {
+    margin-bottom: 6px;
+  }
+
+  .brand h1 {
+    font-size: 1.2rem;
+  }
+
+  .fields {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  input[type='text'],
+  .message-box {
+    padding: 7px 12px;
+  }
+
+  .result {
+    margin-top: 8px;
+  }
+
   .actions {
-    grid-template-columns: 1fr;
+    margin-top: 6px;
+  }
+
+  .btn {
+    min-height: 38px;
+  }
+
+  .feedback {
+    margin-top: 4px;
+  }
+
+  .btn-primary {
+    min-height: 44px;
+    margin-top: 6px;
+  }
+}
+
+/* Libellés courts sur mobile. */
+@media (max-width: 479px) {
+  .wide-only {
+    display: none;
+  }
+}
+
+/* Très petits écrans. */
+@media (max-width: 360px) {
+  .home {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .btn {
+    padding: 8px 10px;
+    font-size: 0.9rem;
   }
 }
 

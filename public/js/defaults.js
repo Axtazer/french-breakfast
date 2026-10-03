@@ -9,11 +9,11 @@ export const DEFAULT_CONFIG = Object.freeze({
   enableByField: true,
   // Un message est tiré au hasard (bouton 🎲 pour en changer). Il doit sonner comme un vrai message de la victime.
   messageTemplates: [
-    "Salut tout le monde ! C'est moi qui ramène les croissants au prochain cours du matin.",
-    "Bonjour à tous ! Pour bien commencer la journée, je m'occupe des croissants au prochain cours du matin.",
-    "Hello ! Petit-déjeuner offert : je ramène les croissants au prochain cours du matin.",
-    "Salut à tous ! Au prochain cours du matin, les croissants sont pour moi.",
-    "Bonjour tout le monde ! J'ai envie de vous faire plaisir : croissants pour tout le monde au prochain cours du matin.",
+    "Salut tout le monde ! La prochaine fois qu'on se voit au p'tit matin, c'est moi qui ramène les croissants.",
+    "Bonjour à tous ! Au p'tit matin de nos retrouvailles, je débarque avec les croissants.",
+    "Hello ! Petit-déj offert : la prochaine fois qu'on se croise le matin, les croissants sont pour moi.",
+    "Salut à tous ! Prochain p'tit matin ensemble = croissants pour tout le monde, c'est moi qui régale.",
+    "Bonjour tout le monde ! J'ai envie de vous faire plaisir : au p'tit matin où on se revoit, croissants pour tous.",
   ],
   // Phrase ajoutée à la fin du message si des collègues sont mentionnés.
   includeTemplate: 'Et oui, même pour {names} !',

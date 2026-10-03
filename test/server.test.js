@@ -24,7 +24,7 @@ test('GET /health renvoie {"status":"ok"}', async () => {
 });
 
 test('GET / sert la page d’accueil avec les headers de sécurité', async () => {
-  const res = await fetch(`${base}/?by=Zorglub42`);
+  const res = await fetch(`${base}/?by=Xyzzy42`);
   assert.equal(res.status, 200);
   assert.match(res.headers.get('content-type'), /text\/html/);
   assert.match(res.headers.get('content-security-policy'), /default-src 'none'/);
@@ -35,7 +35,7 @@ test('GET / sert la page d’accueil avec les headers de sécurité', async () =
   const html = await res.text();
   assert.match(html, /CROISSANTER/);
   // Les paramètres ne sont jamais injectés côté serveur.
-  assert.doesNotMatch(html, /Zorglub42/);
+  assert.doesNotMatch(html, /Xyzzy42/);
 });
 
 test('GET /croissante sert la vue plein écran', async () => {
@@ -47,9 +47,15 @@ test('GET /croissante sert la vue plein écran', async () => {
 });
 
 test('GET /crash sert l’écran de crash', async () => {
-  const res = await fetch(`${base}/crash?by=Flo&os=mac`);
+  const res = await fetch(`${base}/crash?by=Alex&os=mac`);
   assert.equal(res.status, 200);
-  assert.match(await res.text(), /crash-windows/);
+  assert.match(await res.text(), /crash-root/);
+});
+
+test('le QR code statique de l’écran de crash est servi', async () => {
+  const res = await fetch(`${base}/img/qr-boulangerie.svg`);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get('content-type'), /image\/svg\+xml/);
 });
 
 test('GET /config.json expose la configuration publique', async () => {
