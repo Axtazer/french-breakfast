@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULT_CONFIG } from '../public/js/defaults.js';
-import { crashTheme, detectOS, lockHint, parseOSParam, resolveOS } from '../public/js/os.js';
+import { appleDeviceName, crashTheme, detectOS, lockHint, parseOSParam, resolveOS } from '../public/js/os.js';
 
 const UA = {
   windows: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36',
@@ -65,10 +65,21 @@ test('crashTheme associe chaque OS à un écran', () => {
   assert.equal(crashTheme('windows'), 'windows');
   assert.equal(crashTheme('unknown'), 'windows');
   assert.equal(crashTheme('mac'), 'mac');
-  assert.equal(crashTheme('ios'), 'mac');
+  assert.equal(crashTheme('ios'), 'ios');
   assert.equal(crashTheme('mac-classic'), 'mac-classic');
   assert.equal(crashTheme('linux'), 'gnome');
   assert.equal(crashTheme('linux-console'), 'linux');
   assert.equal(crashTheme('chromeos'), 'chromeos');
-  assert.equal(crashTheme('android'), 'linux');
+  assert.equal(crashTheme('android'), 'android');
+});
+
+test('iPad : un "Mac" tactile est un iPad (écran iOS)', () => {
+  const ipadUA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15';
+  assert.equal(detectOS({ userAgent: ipadUA, maxTouchPoints: 5 }), 'ios');
+  assert.equal(detectOS({ userAgent: ipadUA, maxTouchPoints: 0 }), 'mac');
+  assert.equal(appleDeviceName('', { userAgent: ipadUA, maxTouchPoints: 5 }), 'iPad');
+  assert.equal(appleDeviceName('', { userAgent: UA.ios }), 'iPhone');
+  assert.equal(appleDeviceName('?os=ipad', { userAgent: UA.windows }), 'iPad');
+  assert.equal(parseOSParam('iphone'), 'ios');
+  assert.equal(parseOSParam('ipad'), 'ios');
 });

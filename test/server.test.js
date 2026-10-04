@@ -58,6 +58,20 @@ test('le QR code statique de l’écran de crash est servi', async () => {
   assert.match(res.headers.get('content-type'), /image\/svg\+xml/);
 });
 
+test('l’app est installable : manifest et icônes servis', async () => {
+  const manifest = await fetch(`${base}/manifest.webmanifest`);
+  assert.equal(manifest.status, 200);
+  assert.match(manifest.headers.get('content-type'), /application\/manifest\+json/);
+  const json = await manifest.json();
+  assert.equal(json.display, 'fullscreen');
+  for (const icon of json.icons) {
+    const res = await fetch(`${base}/${icon.src}`);
+    assert.equal(res.status, 200, icon.src);
+  }
+  const touchIcon = await fetch(`${base}/img/icon-180.png`);
+  assert.equal(touchIcon.headers.get('content-type'), 'image/png');
+});
+
 test('GET /config.json expose la configuration publique', async () => {
   const res = await fetch(`${base}/config.json`);
   assert.equal(res.status, 200);

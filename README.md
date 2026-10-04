@@ -35,6 +35,10 @@ pour annoncer que son propriétaire ramènera les croissants. Croissanté rend l
 | --- | --- |
 | ![Récupération ChromeOS](docs/screenshot-crash-chromeos.png) | ![Kernel panic Linux](docs/screenshot-crash-linux.png) |
 
+| iPhone / iPad | Android |
+| --- | --- |
+| ![iPhone indisponible](docs/screenshot-crash-ios.png) | ![Android : l'interface système ne répond pas](docs/screenshot-crash-android.png) |
+
 ## Architecture
 
 - **Serveur** : Node.js 22, module `node:http` natif — **zéro dépendance runtime**.
@@ -98,7 +102,7 @@ et des tests simples avec `node --test`, le tout avec un seul langage et sans au
 | `/?by=Alex` | Formulaire avec le croissanteur pré-rempli |
 | `/croissante?by=Alex` | Vue alternative « CE PC A ÉTÉ CROISSANTÉ » (non liée depuis l'accueil) |
 | `/crash?by=Alex` | Faux écran de crash adapté à l'OS détecté (`with` et `m` = mentions et n° de message) |
-| `/crash?os=mac` | Idem en forçant l'OS (`windows`, `mac`, `mac-classic`, `linux`, `linux-console`, `chromeos`, `ios`, `android`) |
+| `/crash?os=mac` | Idem en forçant l'OS (`windows`, `mac`, `mac-classic`, `linux`, `linux-console`, `chromeos`, `iphone`, `ipad`, `android`) |
 | `/health` | `{"status":"ok"}` (HTTP 200) |
 | `/config.json` | Configuration publique utilisée par le frontend |
 
@@ -129,14 +133,32 @@ rien n'est envoyé ni enregistré. Il sert à :
   texte générique sinon) ;
 - choisir l'écran de crash :
   - Windows (et OS inconnu) → écran de crash orange façon Windows ;
-  - macOS récent / iOS → faux redémarrage (écran noir, logo, barre de progression) puis la fenêtre système
+  - macOS récent → faux redémarrage (écran noir, logo, barre de progression) puis la fenêtre système
     « Votre ordinateur a redémarré en raison d'un problème » (Ignorer / Signaler… avec le rapport détaillé) ;
   - ancien Mac (OS X 10.7 et avant) → kernel panic multilingue d'époque (forçable avec `?os=mac-classic`) ;
   - Linux → écran GNOME « Oh non ! Un problème est survenu et le système ne peut pas se rétablir » ;
   - ChromeOS → écran de récupération « croissantOS est manquant ou endommagé » ;
-  - Android, ou `?os=linux-console` → kernel panic console avec QR code texte.
+  - `?os=linux-console` → kernel panic console avec QR code texte ;
+  - iPhone / iPad → écran de verrouillage « iPhone indisponible – Réessayez dans 15 minutes » (compte à rebours),
+    avec le message et le QR code en notifications ; « Urgence » et « Code oublié ? » refusent ;
+  - Android → écran d'accueil avec la fenêtre « L'interface système ne répond pas » (« Fermer l'application » /
+    « Attendre » refusent).
 
 Le navigateur ne dit pas si un poste Linux est sous GNOME ou en console : GNOME est donc l'écran par défaut.
+Un iPad se présente comme un Mac : un « Mac » avec écran tactile est donc traité comme un iPad.
+
+### Sur téléphone
+
+Aucun site ne peut prendre l'écran de façon totalement invisible (c'est une protection des navigateurs) :
+
+| Appareil | Plein écran |
+| --- | --- |
+| Android, iPad | Oui, au toucher (un message « balayer pour quitter » s'affiche brièvement) |
+| iPhone dans Safari | Non : la barre d'adresse reste visible (Safari réserve le plein écran aux vidéos) |
+| iPhone / Android, app installée | Sans barre d'adresse : *Partager → Sur l'écran d'accueil* (iPhone) ou *Installer l'application* (Android), puis lancer depuis l'icône |
+
+L'application est installable grâce à `public/manifest.webmanifest` et aux icônes `public/img/icon-*.png`
+(aucune ressource externe, aucun service worker). Pendant le crash, la barre d'état / d'adresse passe au noir.
 
 Côté Mac, seule une très vieille version est détectable : depuis 2020, Safari et Firefox annoncent tous
 « Mac OS X 10.15.7 » quelle que soit la vraie version, donc tout Mac récent reçoit l'écran moderne.

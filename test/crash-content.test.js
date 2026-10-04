@@ -3,6 +3,11 @@ import assert from 'node:assert/strict';
 import QRCode from 'qrcode';
 import {
   CRASH_QR_URL,
+  androidCrash,
+  formatClock,
+  formatLongDate,
+  formatRetry,
+  iosCrash,
   chromeosCrash,
   gnomeCrash,
   formatCrashTime,
@@ -112,4 +117,32 @@ test('le QR code texte (écran Linux) encode exactement l’URL des boulangeries
       assert.equal(rows[r + quiet][c + quiet], Boolean(data[r * size + c]), `module ${r},${c}`);
     }
   }
+});
+
+test('écran iOS : « iPhone indisponible » / « iPad indisponible »', () => {
+  const text = iosCrash({ ...ctx, device: 'iPhone' });
+  assert.equal(text.title, 'iPhone indisponible');
+  assert.equal(iosCrash({ ...ctx, device: 'iPad' }).title, 'iPad indisponible');
+  assert.equal(iosCrash({ ...ctx, device: 'autre' }).title, 'iPhone indisponible');
+  assert.equal(text.message, ctx.message);
+  assert.ok(text.details.includes('Croissanté par : Alex'));
+  assert.match(text.qrBody, /boulangerie/);
+});
+
+test('écran Android : « L’interface système ne répond pas »', () => {
+  const text = androidCrash(ctx);
+  assert.equal(text.title, 'L’interface système ne répond pas');
+  assert.equal(text.close, 'Fermer l’application');
+  assert.equal(text.wait, 'Attendre');
+  assert.equal(text.message, ctx.message);
+  assert.equal(androidCrash({ ...ctx, by: '' }).details.length, 2);
+});
+
+test('formatRetry, formatLongDate et formatClock', () => {
+  assert.equal(formatRetry(15 * 60), 'Réessayez dans 15 minutes');
+  assert.equal(formatRetry(14 * 60 + 1), 'Réessayez dans 15 minutes');
+  assert.equal(formatRetry(30), 'Réessayez dans 1 minute');
+  assert.equal(formatRetry(0), 'Réessayez dans 1 minute');
+  assert.equal(formatLongDate(new Date(2026, 9, 4, 8, 5)), 'dimanche 4 octobre');
+  assert.equal(formatClock(new Date(2026, 9, 4, 8, 5)), '08:05');
 });

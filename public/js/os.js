@@ -20,6 +20,8 @@ export function detectOS(nav = {}) {
   const hint = String(nav.userAgentData?.platform ?? '').toLowerCase();
   const ua = String(nav.userAgent ?? '').toLowerCase();
   const os = (hint && matchOS(hint)) || matchOS(ua) || 'unknown';
+  // iPadOS se présente comme un Mac : un "Mac" avec écran tactile est un iPad.
+  if (os === 'mac' && nav.maxTouchPoints > 1) return 'ios';
   // La plateforme seule ne donne pas la version de macOS : on la cherche dans le user-agent.
   return os === 'mac' && isClassicMac(ua) ? 'mac-classic' : os;
 }
@@ -53,6 +55,8 @@ export function parseOSParam(value) {
     macclassic: 'mac-classic',
     gnome: 'linux',
     console: 'linux-console',
+    iphone: 'ios',
+    ipad: 'ios',
     cros: 'chromeos',
   };
   const os = aliases[v] ?? v;
@@ -71,13 +75,25 @@ export function lockHint(config, os) {
   return config.fullscreenSubtitle.replace(/\{shortcut\}/g, () => shortcut);
 }
 
+/** "iPad" ou "iPhone", pour les textes de l'écran iOS (?os=ipad / ?os=iphone forcent le choix). */
+export function appleDeviceName(search = '', nav = {}) {
+  const forced = String(new URLSearchParams(search).get('os') ?? '').toLowerCase();
+  if (forced === 'ipad') return 'iPad';
+  if (forced === 'iphone') return 'iPhone';
+  const ua = String(nav.userAgent ?? '').toLowerCase();
+  const isIpad = /ipad/.test(ua) || (/macintosh/.test(ua) && nav.maxTouchPoints > 1);
+  return isIpad ? 'iPad' : 'iPhone';
+}
+
 /** Thème d'écran de crash à utiliser pour un OS. */
 export function crashTheme(os) {
-  if (os === 'mac' || os === 'ios') return 'mac';
+  if (os === 'mac') return 'mac';
+  if (os === 'ios') return 'ios';
+  if (os === 'android') return 'android';
   if (os === 'mac-classic') return 'mac-classic';
   if (os === 'chromeos') return 'chromeos';
-  // Linux de bureau : écran GNOME ; console (kernel panic + QR texte) sur demande ou pour Android.
+  // Linux de bureau : écran GNOME ; console (kernel panic + QR texte) sur demande.
   if (os === 'linux') return 'gnome';
-  if (os === 'linux-console' || os === 'android') return 'linux';
+  if (os === 'linux-console') return 'linux';
   return 'windows';
 }
