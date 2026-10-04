@@ -1,8 +1,13 @@
 // Rendu DOM des écrans de crash, partagé par /crash et par l'accueil (bouton CROISSANTER).
 // Tout le texte passe par textContent : aucune donnée n'est interprétée comme du HTML.
 import {
+  androidCrash,
   chromeosCrash,
+  formatClock,
+  formatLongDate,
   formatMenuBarDate,
+  formatRetry,
+  iosCrash,
   gnomeCrash,
   linuxCrash,
   macClassicCrash,
@@ -291,6 +296,129 @@ function chromeosScreen(ctx) {
   );
 }
 
+/** Barre d'état de téléphone : heure à gauche, réseau et batterie à droite. */
+function phoneStatusBar(className, timers) {
+  const clock = el('span', { className: 'phone-clock' }, formatClock());
+  timers.push(setInterval(() => (clock.textContent = formatClock()), 10000));
+  return el(
+    'div',
+    { className: `phone-status ${className}`, attrs: { 'aria-hidden': 'true' } },
+    clock,
+    el(
+      'span',
+      { className: 'phone-icons' },
+      el('span', { className: 'phone-signal' }, el('i'), el('i'), el('i'), el('i')),
+      el('span', {}, '5G'),
+      el('span', { className: 'phone-battery' }, el('i')),
+    ),
+  );
+}
+
+/** iPhone / iPad : écran de verrouillage « iPhone indisponible », compte à rebours et notifications. */
+function iosScreen(ctx, timers) {
+  const text = iosCrash(ctx);
+  const deadline = Date.now() + 15 * 60 * 1000;
+  const retry = el('p', { className: 'ios-retry' }, formatRetry(15 * 60));
+  timers.push(
+    setInterval(() => {
+      retry.textContent = formatRetry(Math.max(0, deadline - Date.now()) / 1000);
+    }, 1000),
+  );
+  const refused = el('p', { className: 'ios-refused', attrs: { role: 'alert' } });
+  const notification = (app, ...body) =>
+    el(
+      'div',
+      { className: 'ios-notif' },
+      el(
+        'p',
+        { className: 'ios-notif-head' },
+        el('img', { src: 'img/croissant.svg', alt: '', draggable: false }),
+        el('span', {}, app),
+        el('span', { className: 'ios-notif-when' }, 'maintenant'),
+      ),
+      ...body,
+    );
+  return el(
+    'div',
+    { className: 'ios' },
+    phoneStatusBar('ios-status', timers),
+    el(
+      'div',
+      { className: 'ios-content', attrs: { 'data-shake': '' } },
+      el('img', { className: 'ios-lock', src: 'img/lock.svg', alt: '', draggable: false }),
+      el('h1', { className: 'ios-title' }, text.title),
+      retry,
+      el(
+        'div',
+        { className: 'ios-notifs' },
+        notification(
+          text.notificationApp,
+          el('p', { className: 'ios-notif-title' }, text.notificationTitle),
+          el('p', { className: 'ios-notif-body' }, text.message),
+          el('p', { className: 'ios-notif-details' }, text.details.join(' · ')),
+        ),
+        notification(
+          text.qrApp,
+          el(
+            'div',
+            { className: 'ios-notif-qr' },
+            el('p', { className: 'ios-notif-body' }, text.qrBody),
+            darkQr('ios-qr'),
+          ),
+        ),
+      ),
+      refused,
+    ),
+    el(
+      'div',
+      { className: 'ios-bottom' },
+      refusingButton(text.emergency, 'ios-link', refused, text.refused),
+      refusingButton(text.forgot, 'ios-link', refused, text.refused),
+    ),
+    el('div', { className: 'ios-home-indicator', attrs: { 'aria-hidden': 'true' } }),
+  );
+}
+
+/** Android : écran d'accueil + fenêtre « L'interface système ne répond pas ». */
+function androidScreen(ctx, timers) {
+  const text = androidCrash(ctx);
+  const refused = el('p', { className: 'android-refused', attrs: { role: 'alert' } });
+  const option = (icon, label, message) => {
+    const button = refusingButton(label, 'android-option', refused, message);
+    button.prepend(el('span', { className: 'android-option-icon', attrs: { 'aria-hidden': 'true' } }, icon));
+    return button;
+  };
+  const bigClock = el('p', { className: 'android-clock' }, formatClock());
+  timers.push(setInterval(() => (bigClock.textContent = formatClock()), 10000));
+  return el(
+    'div',
+    { className: 'android' },
+    phoneStatusBar('android-status', timers),
+    el(
+      'div',
+      { className: 'android-home', attrs: { 'aria-hidden': 'true' } },
+      bigClock,
+      el('p', { className: 'android-date' }, formatLongDate()),
+      el('div', { className: 'android-apps' }, el('span'), el('span'), el('span'), el('span')),
+    ),
+    el(
+      'div',
+      { className: 'android-scrim' },
+      el(
+        'div',
+        { className: 'android-dialog', attrs: { role: 'alertdialog', 'aria-labelledby': 'android-title', 'data-shake': '' } },
+        el('h1', { className: 'android-title', id: 'android-title' }, text.title),
+        el('p', { className: 'android-message' }, text.message),
+        el('p', { className: 'android-details' }, text.details.join(' · ')),
+        el('div', { className: 'android-qr-row' }, darkQr('android-qr'), el('p', {}, text.qrCaption)),
+        refused,
+        option('✕', text.close, text.refusedClose),
+        option('◷', text.wait, text.refusedWait),
+      ),
+    ),
+  );
+}
+
 function linuxScreen(ctx, timers) {
   const lines = linuxCrash(ctx);
   const log = el('pre', { className: 'kpanic-log' });
@@ -341,6 +469,8 @@ export function mountCrash(root, theme, ctx) {
       'mac-classic': macClassicScreen,
       gnome: gnomeScreen,
       chromeos: chromeosScreen,
+      ios: iosScreen,
+      android: androidScreen,
       linux: linuxScreen,
     }[theme] ??
     windowsScreen;

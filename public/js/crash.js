@@ -2,7 +2,7 @@ import { loadConfig } from './config.js';
 import { formatCrashTime } from './crash-content.js';
 import { blockCopy, fullscreenOnClick, hideIdleCursor, mountCrash } from './crash-view.js';
 import { buildMessage, fullscreenHref, readParams } from './message.js';
-import { crashTheme, lockHint, resolveOS } from './os.js';
+import { appleDeviceName, crashTheme, lockHint, resolveOS } from './os.js';
 
 // Accès direct à /crash (lien partagé, favori…). Depuis l'accueil, le bouton CROISSANTER
 // affiche le même écran sans changer de page, pour pouvoir passer en plein écran dans le même clic.
@@ -24,6 +24,7 @@ async function init() {
     hint: lockHint(config, os),
     stopCode: config.crashStopCode,
     time: formatCrashTime(),
+    device: appleDeviceName(window.location.search, navigator),
   });
   hideIdleCursor(document.body);
   blockCopy(document);

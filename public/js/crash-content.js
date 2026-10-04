@@ -116,6 +116,75 @@ export function chromeosCrash(ctx) {
   };
 }
 
+/** iPhone / iPad : écran de verrouillage « iPhone indisponible », avec notifications. */
+export function iosCrash(ctx) {
+  const device = ctx.device === 'iPad' ? 'iPad' : 'iPhone';
+  const details = [`Heure du croissantage : ${ctx.time}`];
+  if (ctx.by) details.push(`Croissanté par : ${ctx.by}`);
+  details.push(`Code : ${ctx.stopCode}`);
+  return {
+    title: `${device} indisponible`,
+    notificationApp: 'CROISSANTÉ',
+    notificationTitle: 'Croissants attendus 🥐',
+    message: ctx.message,
+    details,
+    qrApp: 'BOULANGERIES',
+    qrBody: 'Scannez ce code pour trouver une boulangerie à proximité.',
+    emergency: 'Urgence',
+    forgot: 'Code oublié ?',
+    refused: `${device} indisponible : ramenez d’abord des croissants.`,
+  };
+}
+
+/** Android : fenêtre « L'interface système ne répond pas » sur l'écran d'accueil. */
+export function androidCrash(ctx) {
+  const details = [`Heure du croissantage : ${ctx.time}`];
+  if (ctx.by) details.push(`Croissanté par : ${ctx.by}`);
+  details.push(`Code : ${ctx.stopCode}`);
+  return {
+    title: 'L’interface système ne répond pas',
+    message: ctx.message,
+    details,
+    qrCaption: 'Scannez ce code pour trouver une boulangerie à proximité.',
+    close: 'Fermer l’application',
+    wait: 'Attendre',
+    refusedClose: 'Impossible de fermer : des croissants sont attendus.',
+    refusedWait: 'Toujours en attente des croissants…',
+  };
+}
+
+/** Compte à rebours de l'écran iOS : "Réessayez dans 15 minutes" / "dans 1 minute". */
+export function formatRetry(secondsLeft) {
+  const minutes = Math.max(1, Math.ceil(secondsLeft / 60));
+  return `Réessayez dans ${minutes} minute${minutes > 1 ? 's' : ''}`;
+}
+
+const LONG_DAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+const LONG_MONTHS = [
+  'janvier',
+  'février',
+  'mars',
+  'avril',
+  'mai',
+  'juin',
+  'juillet',
+  'août',
+  'septembre',
+  'octobre',
+  'novembre',
+  'décembre',
+];
+
+/** Date longue des écrans de téléphone : "samedi 4 octobre". */
+export function formatLongDate(date = new Date()) {
+  return `${LONG_DAYS[date.getDay()]} ${date.getDate()} ${LONG_MONTHS[date.getMonth()]}`;
+}
+
+/** Heure façon téléphone : "08:47". */
+export function formatClock(date = new Date()) {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
 /** Heure du croissantage au format français : "15h42". */
 export function formatCrashTime(date = new Date()) {
   const hh = String(date.getHours()).padStart(2, '0');

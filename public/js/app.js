@@ -2,7 +2,7 @@ import { loadConfig } from './config.js';
 import { formatCrashTime } from './crash-content.js';
 import { blockCopy, fullscreenOnClick, hideIdleCursor, mountCrash } from './crash-view.js';
 import { buildMessage, parseNames, pickTemplateIndex, readParams, sanitizeName } from './message.js';
-import { crashTheme, detectOS, lockHint, resolveOS } from './os.js';
+import { appleDeviceName, crashTheme, detectOS, lockHint, resolveOS } from './os.js';
 
 const RECENT_KEY = 'croissante.recentNames';
 const MAX_RECENT = 8;
@@ -163,17 +163,23 @@ async function init() {
       hint: lockHint(config, os),
       stopCode: config.crashStopCode,
       time: formatCrashTime(),
+      device: appleDeviceName(window.location.search, navigator),
     });
     const showCursor = hideIdleCursor(overlay);
     // Sortie du plein écran (Échap) : un clic sur l'écran de crash y revient.
     const stopFullscreenOnClick = fullscreenOnClick($('crash-root'));
     const allowCopy = blockCopy(document);
     window.getSelection()?.removeAllRanges();
+    // Barre d'état / d'adresse du téléphone en noir pendant le crash.
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    const previousTheme = themeColor?.content;
+    themeColor?.setAttribute('content', '#000000');
     cleanup = () => {
       unmount();
       showCursor();
       stopFullscreenOnClick();
       allowCopy();
+      if (themeColor && previousTheme) themeColor.setAttribute('content', previousTheme);
     };
     overlay.hidden = false;
     document.body.classList.add('is-crashing');

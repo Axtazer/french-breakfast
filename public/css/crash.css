@@ -23,6 +23,11 @@
   height: 100%;
 }
 
+/* Pas de surlignage tactile du navigateur sur les faux boutons système. */
+.crash button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .is-idle,
 .is-idle * {
   cursor: none !important;
@@ -674,6 +679,441 @@
   margin: 0;
   font-size: 0.85rem;
   color: #5f6368;
+}
+
+/* ---------- Téléphones : barre d'état commune ---------- */
+
+.phone-status {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(10px, env(safe-area-inset-top)) 22px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.phone-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.phone-signal {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 11px;
+}
+
+.phone-signal i {
+  width: 3px;
+  background: #fff;
+  border-radius: 1px;
+}
+
+.phone-signal i:nth-child(1) {
+  height: 4px;
+}
+
+.phone-signal i:nth-child(2) {
+  height: 6px;
+}
+
+.phone-signal i:nth-child(3) {
+  height: 8px;
+}
+
+.phone-signal i:nth-child(4) {
+  height: 11px;
+}
+
+.phone-battery {
+  position: relative;
+  width: 24px;
+  height: 11px;
+  padding: 1.5px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 3px;
+}
+
+.phone-battery::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: -3px;
+  width: 2px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0 1px 1px 0;
+}
+
+.phone-battery i {
+  display: block;
+  width: 72%;
+  height: 100%;
+  background: #fff;
+  border-radius: 1.5px;
+}
+
+/* ---------- iPhone / iPad : « iPhone indisponible » ---------- */
+
+.ios {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif;
+  color: #fff;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(110, 70, 160, 0.9), transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(30, 80, 160, 0.9), transparent 60%),
+    #120f1f;
+}
+
+.ios-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  width: min(420px, 100%);
+  padding: calc(max(10px, env(safe-area-inset-top)) + 52px) 16px 8px;
+  overflow: auto;
+}
+
+.ios-lock {
+  width: 20px;
+  margin-bottom: 14px;
+}
+
+.ios-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 7vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.ios-retry {
+  margin: 6px 0 22px;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ios-notifs {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.ios-notif {
+  padding: 10px 14px 12px;
+  text-align: left;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-radius: 20px;
+}
+
+.ios-notif-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.ios-notif-head img {
+  width: 18px;
+  padding: 2px;
+  background: #fff;
+  border-radius: 5px;
+}
+
+.ios-notif-when {
+  margin-left: auto;
+}
+
+.ios-notif-title {
+  margin: 0 0 2px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.ios-notif-body {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.ios-notif-details {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ios-notif-qr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ios-qr {
+  flex: none;
+  width: 110px;
+  border-radius: 8px;
+}
+
+.ios-refused {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  color: #ffd60a;
+}
+
+.ios-refused:empty {
+  display: none;
+}
+
+.ios-bottom {
+  display: flex;
+  justify-content: space-between;
+  width: min(420px, 100%);
+  padding: 10px 28px calc(max(8px, env(safe-area-inset-bottom)) + 18px);
+}
+
+.ios-link {
+  padding: 6px 4px;
+  font: inherit;
+  font-size: 1rem;
+  color: #fff;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.ios-home-indicator {
+  position: absolute;
+  bottom: max(6px, env(safe-area-inset-bottom));
+  left: 50%;
+  width: 134px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 3px;
+  transform: translateX(-50%);
+}
+
+/* Petits iPhone (SE, mini) : notifications compactes pour garder le QR code visible. */
+@media (max-height: 720px) {
+  .ios-content {
+    padding-top: calc(max(10px, env(safe-area-inset-top)) + 40px);
+  }
+
+  .ios-lock {
+    width: 16px;
+    margin-bottom: 8px;
+  }
+
+  .ios-title {
+    font-size: 1.5rem;
+  }
+
+  .ios-retry {
+    margin-bottom: 14px;
+    font-size: 0.9rem;
+  }
+
+  .ios-notif {
+    padding: 8px 12px 10px;
+  }
+
+  .ios-notif-body {
+    font-size: 0.82rem;
+  }
+
+  .ios-notif-details {
+    display: none;
+  }
+
+  .ios-qr {
+    width: 96px;
+  }
+
+  .ios-bottom {
+    padding-top: 4px;
+    padding-bottom: calc(max(8px, env(safe-area-inset-bottom)) + 12px);
+  }
+}
+
+/* ---------- Android : « L'interface système ne répond pas » ---------- */
+
+.android {
+  position: relative;
+  overflow: hidden;
+  font-family: 'Google Sans', Roboto, system-ui, sans-serif;
+  color: #fff;
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(242, 181, 68, 0.85), transparent 55%),
+    radial-gradient(ellipse at 85% 75%, rgba(220, 76, 0, 0.8), transparent 55%),
+    #2a1a0e;
+}
+
+.android-home {
+  position: absolute;
+  inset: 0;
+  padding: calc(max(10px, env(safe-area-inset-top)) + 40px) 26px 0;
+}
+
+.android-clock {
+  margin: 0;
+  font-size: clamp(3.4rem, 18vw, 5rem);
+  font-weight: 300;
+  line-height: 1;
+}
+
+.android-date {
+  margin: 6px 0 0;
+  font-size: 1rem;
+}
+
+.android-apps {
+  position: absolute;
+  bottom: calc(max(12px, env(safe-area-inset-bottom)) + 24px);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+}
+
+.android-apps span {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+}
+
+.android-apps span:nth-child(1) {
+  background: #f2b544;
+}
+
+.android-apps span:nth-child(2) {
+  background: #7ad99a;
+}
+
+.android-apps span:nth-child(3) {
+  background: #8ab4f8;
+}
+
+.android-apps span:nth-child(4) {
+  background: #f28b82;
+}
+
+.android-scrim {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.android-dialog {
+  width: min(380px, 100%);
+  max-height: calc(100% - 40px);
+  overflow: auto;
+  padding: 24px 8px 10px;
+  color: #e6e0e9;
+  background: #2b2930;
+  border-radius: 28px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.android-title {
+  margin: 0 16px 14px;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: #fff;
+}
+
+.android-message {
+  margin: 0 16px 8px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.android-details {
+  margin: 0 16px 12px;
+  font-size: 0.78rem;
+  color: #cac4d0;
+}
+
+.android-qr-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 16px 10px;
+  font-size: 0.8rem;
+  color: #cac4d0;
+}
+
+.android-qr-row p {
+  margin: 0;
+}
+
+.android-qr {
+  flex: none;
+  width: 104px;
+  border-radius: 8px;
+}
+
+.android-refused {
+  margin: 0 16px 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #ffb4ab;
+}
+
+.android-refused:empty {
+  display: none;
+}
+
+.android-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 16px;
+  font: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  color: #e6e0e9;
+  background: none;
+  border: 0;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.android-option:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.android-option-icon {
+  width: 24px;
+  font-size: 1.1rem;
+  text-align: center;
+  color: #cac4d0;
 }
 
 /* ---------- Linux ---------- */

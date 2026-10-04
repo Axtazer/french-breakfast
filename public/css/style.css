@@ -64,6 +64,9 @@ html {
   align-items: center;
   justify-content: center;
   padding: 16px;
+  /* Écrans à encoche (viewport-fit=cover) : on reste dans la zone sûre. */
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
   background:
     radial-gradient(ellipse at top, rgba(242, 181, 68, 0.12), transparent 60%),
     var(--bg);
